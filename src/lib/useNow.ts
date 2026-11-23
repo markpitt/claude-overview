@@ -1,0 +1,11 @@
+import { useEffect, useState } from "react";
+
+/** The current time, updated every `everyMs` so countdowns move. */
+export function useNow(everyMs = 30_000): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), everyMs);
+    return () => window.clearInterval(id);
+  }, [everyMs]);
+  return now;
+}

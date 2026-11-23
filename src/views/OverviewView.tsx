@@ -1,10 +1,14 @@
 import { useApp } from "../store";
 import { StatusHeader } from "../components/StatusHeader";
 import { IncidentList } from "../components/IncidentList";
+import { PlanSummary } from "../components/PlanSummary";
+import { useNow } from "../lib/useNow";
 import { Placeholder } from "./Placeholder";
 
-export function OverviewView({ onShowStatus }: { onShowStatus: () => void }) {
+export function OverviewView({ onShowStatus, onShowCode }: { onShowStatus: () => void; onShowCode: () => void }) {
   const status = useApp((s) => s.status);
+  const cc = useApp((s) => s.cc);
+  const now = useNow();
   const active = status?.activeIncidents ?? [];
   return (
     <div className="stack">
@@ -19,11 +23,20 @@ export function OverviewView({ onShowStatus }: { onShowStatus: () => void }) {
         </section>
       )}
       <div className="grid">
-        <Placeholder
-          title="Max plan"
-          milestone={2}
-          detail="Claude Code tokens by day and project, and the current 5-hour block with its reset countdown."
-        />
+        {cc ? (
+          <section className="card">
+            <h2>Max plan</h2>
+            <PlanSummary cc={cc} now={now} compact />
+            <button type="button" className="ghost" onClick={onShowCode}>
+              Claude Code usage
+            </button>
+          </section>
+        ) : (
+          <section className="card">
+            <h2>Max plan</h2>
+            <p className="muted">Reading Claude Code logs…</p>
+          </section>
+        )}
         <Placeholder
           title="API credit"
           milestone={3}

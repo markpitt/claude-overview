@@ -3,11 +3,15 @@ import { useApp } from "../store";
 import { StatusHeader } from "../components/StatusHeader";
 import { IncidentList } from "../components/IncidentList";
 import { LevelDot } from "../components/LevelDot";
+import { PlanSummary } from "../components/PlanSummary";
 import { componentStatusLabel } from "../lib/format";
+import { useNow } from "../lib/useNow";
 
 /** The compact panel opened from the tray. */
 export function Popover() {
   const status = useApp((s) => s.status);
+  const cc = useApp((s) => s.cc);
+  const now = useNow();
   const unhealthy = (status?.components ?? []).filter((c) => c.level !== "ok");
 
   return (
@@ -39,11 +43,13 @@ export function Popover() {
           </ul>
         </section>
       )}
+      {cc && (
+        <section>
+          <h3>Max plan</h3>
+          <PlanSummary cc={cc} now={now} compact />
+        </section>
+      )}
       <section className="coming">
-        <div>
-          <span>Max plan</span>
-          <span className="muted small">milestone 2</span>
-        </div>
         <div>
           <span>API credit</span>
           <span className="muted small">milestone 3</span>
