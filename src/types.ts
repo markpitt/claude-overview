@@ -34,3 +34,54 @@ export interface StatusSnapshot {
   fetchedAtMs: number;
   error: string | null;
 }
+
+// Claude Code usage. Keep in step with src-tauri/src/cc_service.rs and store.rs.
+
+export interface HourRow {
+  hourMs: number;
+  model: string;
+  project: string;
+  tokens: number;
+  output: number;
+  costUsd: number;
+  messages: number;
+  sessions: number;
+}
+
+export interface Block {
+  startMs: number;
+  endMs: number;
+  lastActivityMs: number;
+  tokens: number;
+  costUsd: number;
+  messages: number;
+}
+
+export interface CcSettings {
+  folderOverride: string | null;
+  blockLimitUsd: number | null;
+  weekLimitUsd: number | null;
+  planPriceUsd: number | null;
+}
+
+export interface Totals {
+  tokens: number;
+  costUsd: number;
+  messages: number;
+}
+
+export interface CcSummary {
+  folder: string | null;
+  folderExists: boolean;
+  files: number;
+  linesParsed: number;
+  linesSkipped: number;
+  lastScanMs: number;
+  error: string | null;
+  hourly: HourRow[];
+  currentBlock: Block | null;
+  lastBlock: Block | null;
+  week: Totals;
+  unpricedModels: string[];
+  settings: CcSettings;
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { getVersion } from "@tauri-apps/api/app";
 import { Link } from "../components/Link";
+import { CcSettingsForm } from "../components/CcSettingsForm";
 
 export function SettingsView() {
   const [autostart, setAutostart] = useState<boolean | null>(null);
@@ -38,11 +39,15 @@ export function SettingsView() {
         </label>
         {error && <p className="error small">{error}</p>}
       </section>
+      <section className="card">
+        <h2>Max plan and Claude Code</h2>
+        <CcSettingsForm />
+      </section>
       <section className="card placeholder">
-        <h2>Keys and limits</h2>
+        <h2>Keys</h2>
         <p className="muted">
-          Admin and standard API keys, the GitHub token, your Max plan limits and the credit allowance arrive with
-          milestones 2 to 4. Keys will be kept in the OS keychain and never written to disk.
+          Admin and standard API keys, the GitHub token and the credit allowance arrive with milestones 3 and 4. Keys
+          will be kept in the OS keychain and never written to disk.
         </p>
       </section>
       <section className="card">

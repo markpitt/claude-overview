@@ -1,9 +1,13 @@
 //! Claude Overview: a tray app for Claude usage, plan, waiting work and status.
 //!
-//! Rust owns every network call and (from milestone 3) every key. The React
+//! Rust owns every network call, file read and (from milestone 3) every key. The React
 //! UI in the two webviews only renders what Rust emits and sends back commands.
 
+mod cc_service;
+mod cc_task;
+mod claude_code;
 mod status;
+mod store;
 mod tray_icon;
 
 use std::sync::Mutex;
@@ -260,15 +264,26 @@ pub fn run() {
             get_status,
             refresh_status,
             show_main,
-            hide_popover
+            hide_popover,
+            cc_task::get_claude_code,
+            cc_task::refresh_claude_code,
+            cc_task::save_cc_settings
         ])
         .setup(|app| {
             // A tray app: no Dock icon on macOS.
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
 
+            // Local cache: Claude Code usage, read positions and settings.
+            let data_dir = app.path().app_data_dir()?;
+            std::fs::create_dir_all(&data_dir)?;
+            let store = store::Store::open(&data_dir.join("overview.db"))
+                .map_err(|e| format!("opening the local database: {e}"))?;
+            app.manage(cc_task::CcState::new(store));
+
             build_tray(app.handle())?;
             spawn_status_poller(app.handle().clone());
+            cc_task::spawn(app.handle().clone());
 
             // Started by hand: show the window, since on GNOME without the
             // AppIndicator extension there is no tray icon to click.
