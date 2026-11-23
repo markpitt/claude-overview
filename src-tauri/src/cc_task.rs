@@ -166,6 +166,7 @@ pub fn spawn(app: AppHandle) {
             let state = app.state::<CcState>();
             *state.last.lock().expect("cc lock") = Some(summary.clone());
             let _ = app.emit("claude-code-updated", &summary);
+            crate::alerts::on_claude_code(&app, &summary);
 
             tokio::select! {
                 _ = tokio::time::sleep(SCAN_EVERY) => {}

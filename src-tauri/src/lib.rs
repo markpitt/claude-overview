@@ -3,6 +3,7 @@
 //! Rust owns every network call, file read and (from milestone 3) every key. The React
 //! UI in the two webviews only renders what Rust emits and sends back commands.
 
+mod alerts;
 mod api_credit;
 mod api_task;
 mod batches;
@@ -11,12 +12,15 @@ mod cc_task;
 mod claude_code;
 mod github;
 mod hooks;
+mod hotkey;
 mod keys;
 mod status;
 mod store;
 mod tray_icon;
+mod updater;
 mod waiting_task;
 
+use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -84,12 +88,21 @@ fn place_top_right(w: &tauri::WebviewWindow) {
     let _ = w.set_position(tauri::PhysicalPosition::new(x.max(0.0), y.max(0.0)));
 }
 
+/// When the pop-over last hid because focus left it.
+static POPOVER_BLURRED_MS: AtomicU64 = AtomicU64::new(0);
+/// A toggle this soon after that is the same press that took the focus away
+/// (the shortcut's key grab, or a click on the tray icon), so it should close.
+const BLUR_GRACE_MS: u64 = 400;
+
 fn toggle_popover(app: &AppHandle, from_tray_click: bool) {
     let Some(w) = app.get_webview_window(POPOVER) else {
         return;
     };
     if w.is_visible().unwrap_or(false) {
         let _ = w.hide();
+        return;
+    }
+    if now_ms().saturating_sub(POPOVER_BLURRED_MS.load(Ordering::Relaxed)) < BLUR_GRACE_MS {
         return;
     }
     // Show first: on Linux the window has no real size until it is mapped,
@@ -143,6 +156,7 @@ fn apply_status(app: &AppHandle, snap: &StatusSnapshot) {
         let _ = tray.set_tooltip(Some(tip));
     }
     let _ = app.emit("status-updated", snap);
+    alerts::on_status(app, snap);
 }
 
 fn spawn_status_poller(app: AppHandle) {
@@ -257,6 +271,11 @@ pub fn run() {
 
     #[cfg(desktop)]
     {
+        builder = builder.plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| hotkey::handle(app, shortcut, event.state()))
+                .build(),
+        );
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             // A second launch drives the running copy instead of starting another.
             if args.iter().any(|a| a == POPOVER_ARG) {
@@ -270,6 +289,8 @@ pub fn run() {
     let app = builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_positioner::init())
+        .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             Some(vec![HIDDEN_ARG]),
@@ -293,7 +314,15 @@ pub fn run() {
             waiting_task::get_waiting,
             waiting_task::refresh_waiting,
             waiting_task::set_waiting_key,
-            waiting_task::set_hooks
+            waiting_task::set_hooks,
+            alerts::get_alert_settings,
+            alerts::save_alert_settings,
+            alerts::test_alert,
+            hotkey::get_hotkey,
+            hotkey::set_hotkey,
+            updater::get_update,
+            updater::check_update,
+            updater::install_update
         ])
         .setup(|app| {
             // A tray app: no Dock icon on macOS.
@@ -307,7 +336,10 @@ pub fn run() {
                 .map_err(|e| format!("opening the local database: {e}"))?;
             let store = Arc::new(Mutex::new(store));
             app.manage(cc_task::CcState::new(store.clone()));
-            app.manage(api_task::ApiState::new(store));
+            app.manage(api_task::ApiState::new(store.clone()));
+            app.manage(alerts::AlertState::new(store.clone()));
+            app.manage(hotkey::HotkeyState::new(store));
+            app.manage(updater::UpdateState::new(app.package_info().version.to_string()));
             app.manage(waiting_task::WaitingState::new());
 
             build_tray(app.handle())?;
@@ -315,6 +347,8 @@ pub fn run() {
             cc_task::spawn(app.handle().clone());
             api_task::spawn(app.handle().clone());
             waiting_task::spawn(app.handle().clone());
+            updater::spawn(app.handle().clone());
+            hotkey::init(app.handle());
 
             // Started by hand: show the window, since on GNOME without the
             // AppIndicator extension there is no tray icon to click.
@@ -333,7 +367,8 @@ pub fn run() {
                 let _ = window.hide();
             }
             // The pop-over behaves like a menu: it goes when focus leaves.
-            WindowEvent::Focused(false) if window.label() == POPOVER => {
+            WindowEvent::Focused(false) if window.label() == POPOVER && window.is_visible().unwrap_or(false) => {
+                POPOVER_BLURRED_MS.store(now_ms(), Ordering::Relaxed);
                 let _ = window.hide();
             }
             _ => {}

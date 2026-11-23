@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { ApiSettings, ApiSnapshot, CcSettings, CcSummary, StatusSnapshot, WaitingSnapshot } from "./types";
+import type { ApiSettings, ApiSnapshot, CcSettings, CcSummary, StatusSnapshot, UpdateSnapshot, WaitingSnapshot } from "./types";
 
 interface AppStore {
   status: StatusSnapshot | null;
@@ -21,6 +21,7 @@ interface AppStore {
   refreshWaiting: () => Promise<void>;
   setWaitingKey: (kind: "api" | "github", value: string | null) => Promise<void>;
   setHooks: (on: boolean) => Promise<void>;
+  update: UpdateSnapshot | null;
 }
 
 /** Marks a request busy, and clears the flag if it fails (a push clears it on success). */
@@ -55,6 +56,7 @@ export const useApp = create<AppStore>((set) => ({
   refreshWaiting: () => busy(set, "waitingBusy", () => invoke("refresh_waiting")),
   setWaitingKey: (kind, value) => busy(set, "waitingBusy", () => invoke("set_waiting_key", { kind, value })),
   setHooks: (on) => busy(set, "waitingBusy", () => invoke("set_hooks", { on })),
+  update: null,
 }));
 
 let started = false;
@@ -75,6 +77,9 @@ export async function startStore(): Promise<void> {
   await listen<WaitingSnapshot>("waiting-updated", (e) => {
     useApp.setState({ waiting: e.payload, waitingBusy: false });
   });
+  await listen<UpdateSnapshot>("update-updated", (e) => {
+    useApp.setState({ update: e.payload });
+  });
   const current = await invoke<StatusSnapshot>("get_status");
   // A push may have landed first; keep the newer one.
   const existing = useApp.getState().status;
@@ -93,5 +98,9 @@ export async function startStore(): Promise<void> {
   const waiting = await invoke<WaitingSnapshot>("get_waiting").catch(() => null);
   if (waiting && !useApp.getState().waiting) {
     useApp.setState({ waiting });
+  }
+  const update = await invoke<UpdateSnapshot>("get_update").catch(() => null);
+  if (update && !useApp.getState().update) {
+    useApp.setState({ update });
   }
 }

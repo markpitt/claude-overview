@@ -5,6 +5,9 @@ import { Link } from "../components/Link";
 import { CcSettingsForm } from "../components/CcSettingsForm";
 import { ApiSettingsForm } from "../components/ApiSettingsForm";
 import { WaitingSettingsForm } from "../components/WaitingSettingsForm";
+import { AlertSettingsForm } from "../components/AlertSettingsForm";
+import { HotkeyForm } from "../components/HotkeyForm";
+import { UpdatesPanel } from "../components/UpdatesPanel";
 
 export function SettingsView() {
   const [autostart, setAutostart] = useState<boolean | null>(null);
@@ -53,6 +56,18 @@ export function SettingsView() {
         <h2>What's waiting</h2>
         <WaitingSettingsForm />
         <p className="muted small">Keys and tokens are kept in the OS keychain, never on disk.</p>
+      </section>
+      <section className="card">
+        <h2>Alerts</h2>
+        <AlertSettingsForm />
+      </section>
+      <section className="card">
+        <h2>Keyboard shortcut</h2>
+        <HotkeyForm />
+      </section>
+      <section className="card">
+        <h2>Updates</h2>
+        <UpdatesPanel />
       </section>
       <section className="card">
         <h2>About</h2>

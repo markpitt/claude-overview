@@ -235,3 +235,13 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tag-batch { background: color-mix(in srgb, var(--fam-sonnet) 20%, transparent); color: var(--fam-sonnet); }
 .badge { flex: none; font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
 .count { font-size: 11px; font-weight: 600; min-width: 18px; text-align: center; padding: 0 5px; border-radius: 9px; background: var(--bad); color: #fff; }
+
+/* Alerts, shortcut and updates */
+.form label.check { flex-direction: row; align-items: flex-start; gap: 8px; }
+.form label.check input { margin-top: 3px; }
+.form select { font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px; max-width: 140px; }
+.shortcut { min-width: 140px; font-variant-numeric: tabular-nums; }
+.shortcut.recording { box-shadow: 0 0 0 2px var(--accent); }
+.update-ready { border-left: 3px solid var(--ok); padding-left: 10px; display: flex; flex-direction: column; gap: 6px; }
+.clip-lines { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; margin: 0; }
+.count.update { background: var(--ok); }

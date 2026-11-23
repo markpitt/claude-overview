@@ -5,7 +5,8 @@ A small tray app for Windows, Linux and macOS that shows, in one place:
 - **Service status** from status.claude.com *(milestone 1)*
 - **Max plan usage** from local Claude Code logs, with the 5-hour block countdown *(milestone 2)*
 - **API credit** spend against the monthly allowance, with a forecast *(milestone 3)*
-- **What's waiting**: Claude Code sessions, batches in progress and PRs to review *(milestone 4, this PR)*
+- **What's waiting**: Claude Code sessions, batches in progress and PRs to review *(milestone 4)*
+- **Alerts**, a **global shortcut** for the pop-over, and **signed updates** from GitHub releases *(milestone 5, this PR)*
 
 Built with [Tauri 2](https://tauri.app) and React + TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 
@@ -16,7 +17,8 @@ Built with [Tauri 2](https://tauri.app) and React + TypeScript. Rust owns every 
 - **Tray icon**: green, amber or red for the worst current state, grey when status can't be read. Hover for the headline.
 - **Pop-over**: click the tray icon (Windows, macOS) or choose *Show summary* from its menu.
 - **Main window**: *Open Claude Overview* from the tray menu, or launch the app again.
-- **Linux**: tray icons send no click events, so the pop-over opens from the menu. Bind a desktop shortcut to `claude-overview --popover` to toggle it from the keyboard. On GNOME, install the *AppIndicator and KStatusNotifierItem Support* extension or no tray icon shows; the main window still opens on launch.
+- **Keyboard**: Ctrl+Alt+O (⌘⌥O on a Mac) opens and closes the pop-over from any app. Change or turn it off in Settings.
+- **Linux**: tray icons send no click events, so the pop-over opens from the menu or the shortcut. Global shortcuts need X11; under Wayland, bind a desktop shortcut to `claude-overview --popover` instead. On GNOME, install the *AppIndicator and KStatusNotifierItem Support* extension or no tray icon shows; the main window still opens on launch.
 - **Start at login**: Settings → *Start at login, in the tray*. The login entry passes `--hidden`, so nothing opens until you ask.
 
 Closing the main window hides it. *Quit* is in the tray menu.
@@ -64,6 +66,34 @@ The API key and token go into the OS keychain like the Admin key. The tab shows 
 
 ![What's waiting](docs/screenshots/waiting.png)
 
+## Alerts
+
+Desktop notifications, each of which can be turned off in Settings:
+
+- a Claude incident starts, and when it is resolved;
+- the 5-hour block or the last 7 days pass 80% of your allowance estimate (the threshold is adjustable);
+- API spend passes 80% of the monthly credit;
+- a pull request needs your review, or Claude opens one.
+
+Each threshold alerts once, then re-arms when use drops below it again (a new block, week or credit period). What has been alerted is kept in the local database, so a restart doesn't repeat it. The first list of pull requests after adding a token is taken in silently. *Send a test notification* checks your OS lets them through.
+
+![Alert settings](docs/screenshots/settings-alerts.png)
+
+## Updates
+
+Once a day the app checks GitHub releases for a newer version. When there is one, it shows in Settings (and the tab gets an *Update* badge) with *Install and restart*. Packages are signed, and the app refuses one whose signature doesn't match the public key built into it. On Linux the update installs the same kind of package you have (.deb or AppImage); the .deb needs your password for `dpkg`.
+
+![Updates](docs/screenshots/settings-updates.png)
+
+## Releasing
+
+1. Set the version everywhere: `node scripts/version.mjs 0.2.0`, then commit and merge.
+2. Tag the merge and push the tag: `git tag v0.2.0 && git push origin v0.2.0`.
+3. The *Release* workflow checks the tag matches the version, builds Linux (.deb, AppImage), Windows (NSIS installer) and macOS (universal .app, .dmg), signs the update files and attaches everything, with `latest.json`, to a **draft** release.
+4. Review the draft on GitHub and publish it. Installed apps pick it up within a day.
+
+The signing key lives in the repository secrets `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` (empty). Its public half is `plugins.updater.pubkey` in `src-tauri/tauri.conf.json`. Losing the private key means installed copies can't update; they would need a manual reinstall with a new key. Builds are unsigned at the OS level, so Windows SmartScreen and macOS Gatekeeper warn on first install.
+
 ## Developing
 
 Prerequisites: Node 22, stable Rust, and on Linux the Tauri packages:
@@ -86,6 +116,8 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 
 `CLAUDE_OVERVIEW_GITHUB_BASE` points the PR search at a test server, and batches use `CLAUDE_OVERVIEW_API_BASE`. The waiting screenshots used the same mock with made-up batches and PRs, and markers written by piping hook JSON into `claude-overview --hook`.
 
+`CLAUDE_OVERVIEW_UPDATE_URL` points the update check at another `latest.json`. Release builds only accept `https` there unless the build also takes `--config` with `plugins.updater.dangerousInsecureTransportProtocol` set, which is how the update was tested against a local server.
+
 `CLAUDE_OVERVIEW_STATUS_BASE` points the status poller at another feed, which is how the degraded screenshots were made from `src-tauri/tests/fixtures/summary-degraded.json` (a synthetic outage).
 
 ## Layout
@@ -100,11 +132,16 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 | `src-tauri/src/hooks.rs` | Claude Code hooks: `--hook` mode, marker files, adding and removing settings entries |
 | `src-tauri/src/batches.rs`, `github.rs` | Message Batches list; GitHub PR search |
 | `src-tauri/src/waiting_task.rs` | Marker watcher and 5-minute poller for what's waiting |
+| `src-tauri/src/alerts.rs` | Alert rules and their memory; desktop notifications |
+| `src-tauri/src/hotkey.rs` | Global shortcut for the pop-over |
+| `src-tauri/src/updater.rs` | Daily update check, download and install |
 | `src-tauri/src/keys.rs` | API keys and the GitHub token in the OS keychain |
 | `src-tauri/src/tray_icon.rs` | Status-coloured tray icons drawn at runtime |
 | `src-tauri/src/lib.rs` | Windows, tray, poller, commands |
 | `src/` | React UI; `App.tsx` picks the pop-over or main window by window label |
 | `docs/` | Plan and screenshots |
 | `.github/workflows/ci.yml` | Typecheck, lint, tests, clippy, and builds for all three OSes |
+| `.github/workflows/release.yml` | Draft release with signed installers and `latest.json`, on a `v*` tag |
+| `scripts/version.mjs` | Sets or checks the version in package.json, tauri.conf.json and Cargo.toml |
 
 See [docs/plan.md](docs/plan.md) for the full plan and decisions.
