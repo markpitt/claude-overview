@@ -4,6 +4,7 @@ import { StatusHeader } from "../components/StatusHeader";
 import { IncidentList } from "../components/IncidentList";
 import { LevelDot } from "../components/LevelDot";
 import { PlanSummary } from "../components/PlanSummary";
+import { CreditSummary } from "../components/CreditSummary";
 import { componentStatusLabel } from "../lib/format";
 import { useNow } from "../lib/useNow";
 
@@ -11,6 +12,7 @@ import { useNow } from "../lib/useNow";
 export function Popover() {
   const status = useApp((s) => s.status);
   const cc = useApp((s) => s.cc);
+  const api = useApp((s) => s.api);
   const now = useNow();
   const unhealthy = (status?.components ?? []).filter((c) => c.level !== "ok");
 
@@ -49,11 +51,13 @@ export function Popover() {
           <PlanSummary cc={cc} now={now} compact />
         </section>
       )}
+      {api?.configured && (
+        <section>
+          <h3>API credit</h3>
+          <CreditSummary api={api} now={now} compact />
+        </section>
+      )}
       <section className="coming">
-        <div>
-          <span>API credit</span>
-          <span className="muted small">milestone 3</span>
-        </div>
         <div>
           <span>What's waiting</span>
           <span className="muted small">milestone 4</span>

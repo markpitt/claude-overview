@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "starting_at": "2026-11-17T00:00:00Z",
+      "ending_at": "2026-11-18T00:00:00Z",
+      "group": { "product": null, "model": "claude-opus-5-5", "workspace_id": null, "api_key_id": null },
+      "cost": { "currency": "USD", "amount": "412.800000", "list_amount": "516.000000", "requests": 120 }
+    },
+    {
+      "starting_at": "2026-11-17T00:00:00Z",
+      "ending_at": "2026-11-18T00:00:00Z",
+      "group": { "product": null, "model": "claude-sonnet-5-5", "workspace_id": null, "api_key_id": null },
+      "cost": { "currency": "USD", "amount": "95.500000", "list_amount": "95.500000", "requests": 40 }
+    },
+    {
+      "starting_at": "2026-11-18T00:00:00Z",
+      "ending_at": "2026-11-19T00:00:00Z",
+      "group": { "product": null, "model": null, "workspace_id": null, "api_key_id": null },
+      "cost": { "currency": "USD", "amount": "1.000000", "list_amount": "1.000000", "requests": null }
+    }
+  ],
+  "has_more": true,
+  "next_page": "page_2",
+  "data_refreshed_at": "2026-11-23T16:02:11Z"
+}

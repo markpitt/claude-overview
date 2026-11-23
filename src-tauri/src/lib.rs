@@ -3,14 +3,17 @@
 //! Rust owns every network call, file read and (from milestone 3) every key. The React
 //! UI in the two webviews only renders what Rust emits and sends back commands.
 
+mod api_credit;
+mod api_task;
 mod cc_service;
 mod cc_task;
 mod claude_code;
+mod keys;
 mod status;
 mod store;
 mod tray_icon;
 
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use status::{Level, StatusSnapshot};
@@ -214,7 +217,11 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         .on_menu_event(|app, event| match event.id.as_ref() {
             "summary" => toggle_popover(app, false),
             "open" => show_main(app.clone()),
-            "refresh" => app.state::<AppState>().refresh.notify_one(),
+            "refresh" => {
+                app.state::<AppState>().refresh.notify_one();
+                app.state::<cc_task::CcState>().refresh();
+                app.state::<api_task::ApiState>().refresh();
+            }
             "quit" => app.exit(0),
             _ => {}
         })
@@ -267,7 +274,11 @@ pub fn run() {
             hide_popover,
             cc_task::get_claude_code,
             cc_task::refresh_claude_code,
-            cc_task::save_cc_settings
+            cc_task::save_cc_settings,
+            api_task::get_api_credit,
+            api_task::refresh_api_credit,
+            api_task::save_api_settings,
+            api_task::set_admin_key
         ])
         .setup(|app| {
             // A tray app: no Dock icon on macOS.
@@ -279,11 +290,14 @@ pub fn run() {
             std::fs::create_dir_all(&data_dir)?;
             let store = store::Store::open(&data_dir.join("overview.db"))
                 .map_err(|e| format!("opening the local database: {e}"))?;
-            app.manage(cc_task::CcState::new(store));
+            let store = Arc::new(Mutex::new(store));
+            app.manage(cc_task::CcState::new(store.clone()));
+            app.manage(api_task::ApiState::new(store));
 
             build_tray(app.handle())?;
             spawn_status_poller(app.handle().clone());
             cc_task::spawn(app.handle().clone());
+            api_task::spawn(app.handle().clone());
 
             // Started by hand: show the window, since on GNOME without the
             // AppIndicator extension there is no tray icon to click.
