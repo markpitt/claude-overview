@@ -4,7 +4,8 @@ import { LevelDot } from "../components/LevelDot";
 import { OverviewView } from "./OverviewView";
 import { StatusView } from "./StatusView";
 import { SettingsView } from "./SettingsView";
-import { Placeholder } from "./Placeholder";
+import { WaitingView } from "./WaitingView";
+import { waitingCounts } from "../lib/waiting";
 import { ClaudeCodeView } from "./ClaudeCodeView";
 import { ApiView } from "./ApiView";
 
@@ -22,6 +23,7 @@ const TABS: { id: Tab; label: string }[] = [
 export function MainWindow() {
   const [tab, setTab] = useState<Tab>("overview");
   const level = useApp((s) => s.status?.level ?? "unknown");
+  const waitingTotal = useApp((s) => waitingCounts(s.waiting).total);
 
   return (
     <div className="main-layout">
@@ -37,10 +39,11 @@ export function MainWindow() {
           >
             {t.label}
             {t.id === "status" && <LevelDot level={level} size={8} />}
+            {t.id === "waiting" && waitingTotal > 0 && <span className="count">{waitingTotal}</span>}
           </button>
         ))}
       </nav>
-      <main className="content">
+      <main className="content" key={tab}>
         <h1>{TABS.find((t) => t.id === tab)?.label}</h1>
         {tab === "overview" && (
           <OverviewView
@@ -48,6 +51,7 @@ export function MainWindow() {
             onShowCode={() => setTab("code")}
             onShowApi={() => setTab("api")}
             onShowSettings={() => setTab("settings")}
+            onShowWaiting={() => setTab("waiting")}
           />
         )}
         {tab === "api" && (
@@ -55,7 +59,7 @@ export function MainWindow() {
         )}
         {tab === "code" && <ClaudeCodeView />}
         {tab === "waiting" && (
-          <Placeholder title="What's waiting" milestone={4} detail="Claude Code sessions, batches and pull requests." />
+          <WaitingView onShowSettings={() => setTab("settings")} />
         )}
         {tab === "status" && <StatusView />}
         {tab === "settings" && <SettingsView />}

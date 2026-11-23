@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { ApiSettings, ApiSnapshot, CcSettings, CcSummary, StatusSnapshot } from "./types";
+import type { ApiSettings, ApiSnapshot, CcSettings, CcSummary, StatusSnapshot, WaitingSnapshot } from "./types";
 
 interface AppStore {
   status: StatusSnapshot | null;
@@ -16,10 +16,15 @@ interface AppStore {
   refreshApi: () => Promise<void>;
   saveApiSettings: (s: ApiSettings) => Promise<void>;
   setAdminKey: (key: string | null) => Promise<void>;
+  waiting: WaitingSnapshot | null;
+  waitingBusy: boolean;
+  refreshWaiting: () => Promise<void>;
+  setWaitingKey: (kind: "api" | "github", value: string | null) => Promise<void>;
+  setHooks: (on: boolean) => Promise<void>;
 }
 
 /** Marks a request busy, and clears the flag if it fails (a push clears it on success). */
-async function busy(set: (s: Partial<AppStore>) => void, flag: "ccScanning" | "apiFetching", run: () => Promise<unknown>) {
+async function busy(set: (s: Partial<AppStore>) => void, flag: "ccScanning" | "apiFetching" | "waitingBusy", run: () => Promise<unknown>) {
   set({ [flag]: true });
   try {
     await run();
@@ -45,6 +50,11 @@ export const useApp = create<AppStore>((set) => ({
   refreshApi: () => busy(set, "apiFetching", () => invoke("refresh_api_credit")),
   saveApiSettings: (settings) => busy(set, "apiFetching", () => invoke("save_api_settings", { settings })),
   setAdminKey: (key) => busy(set, "apiFetching", () => invoke("set_admin_key", { key })),
+  waiting: null,
+  waitingBusy: false,
+  refreshWaiting: () => busy(set, "waitingBusy", () => invoke("refresh_waiting")),
+  setWaitingKey: (kind, value) => busy(set, "waitingBusy", () => invoke("set_waiting_key", { kind, value })),
+  setHooks: (on) => busy(set, "waitingBusy", () => invoke("set_hooks", { on })),
 }));
 
 let started = false;
@@ -62,6 +72,9 @@ export async function startStore(): Promise<void> {
   await listen<ApiSnapshot>("api-credit-updated", (e) => {
     useApp.setState({ api: e.payload, apiFetching: false });
   });
+  await listen<WaitingSnapshot>("waiting-updated", (e) => {
+    useApp.setState({ waiting: e.payload, waitingBusy: false });
+  });
   const current = await invoke<StatusSnapshot>("get_status");
   // A push may have landed first; keep the newer one.
   const existing = useApp.getState().status;
@@ -76,5 +89,9 @@ export async function startStore(): Promise<void> {
   const api = await invoke<ApiSnapshot>("get_api_credit").catch(() => null);
   if (api && !useApp.getState().api) {
     useApp.setState({ api });
+  }
+  const waiting = await invoke<WaitingSnapshot>("get_waiting").catch(() => null);
+  if (waiting && !useApp.getState().waiting) {
+    useApp.setState({ waiting });
   }
 }

@@ -4,19 +4,23 @@ import { IncidentList } from "../components/IncidentList";
 import { PlanSummary } from "../components/PlanSummary";
 import { CreditSummary } from "../components/CreditSummary";
 import { useNow } from "../lib/useNow";
-import { Placeholder } from "./Placeholder";
+import { WaitingList } from "../components/WaitingList";
+import { anythingSetUp } from "../lib/waiting";
 
 export function OverviewView({
   onShowStatus,
   onShowCode,
   onShowApi,
   onShowSettings,
+  onShowWaiting,
 }: {
   onShowStatus: () => void;
   onShowCode: () => void;
   onShowApi: () => void;
   onShowSettings: () => void;
+  onShowWaiting: () => void;
 }) {
+  const waiting = useApp((s) => s.waiting);
   const api = useApp((s) => s.api);
   const status = useApp((s) => s.status);
   const cc = useApp((s) => s.cc);
@@ -58,12 +62,16 @@ export function OverviewView({
             </button>
           )}
         </section>
-        <Placeholder
-          title="What's waiting"
-          milestone={4}
-          detail="Claude Code sessions waiting for you, batches in progress, and PRs to review."
-        />
       </div>
+      <section className="card">
+        <h2>What's waiting</h2>
+        <WaitingList waiting={waiting} now={now} onSetUp={onShowSettings} />
+        {waiting?.checked && anythingSetUp(waiting) && (
+          <button type="button" className="ghost" onClick={onShowWaiting}>
+            Everything waiting
+          </button>
+        )}
+      </section>
     </div>
   );
 }

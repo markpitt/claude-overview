@@ -32,6 +32,6 @@ There is no public API for Max plan percentages, claude.ai Projects or claude.ai
 
 1. Skeleton and status: tray, pop-over, main window, status panel, CI. **Done.**
 2. Claude Code usage: JSONL reader, SQLite store, per-project usage, 5-hour block countdown. **Done.**
-3. API credit: keychain, Admin API, spend vs allowance, burn rate and forecast. **(this PR)**
-4. What's waiting: Claude Code sessions, batches, PRs.
+3. API credit: keychain, Admin API, spend vs allowance, burn rate and forecast. **Done.**
+4. What's waiting: Claude Code sessions (through hooks), batches, PRs. **(this PR)**
 5. Alerts, global hotkey, release workflow and updater.

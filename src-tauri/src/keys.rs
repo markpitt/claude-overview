@@ -5,6 +5,8 @@
 const SERVICE: &str = "dev.markpitt.claudeoverview";
 
 pub const ADMIN_KEY: &str = "anthropic-admin-key";
+pub const API_KEY: &str = "anthropic-api-key";
+pub const GITHUB_TOKEN: &str = "github-token";
 
 fn entry(name: &str) -> Result<keyring::Entry, String> {
     keyring::Entry::new(SERVICE, name).map_err(|e| format!("The OS keychain isn't available: {e}"))
@@ -48,6 +50,26 @@ pub fn check_admin_key(key: &str) -> Result<(), String> {
     }
 }
 
+/// An ordinary API key, for listing batches.
+pub fn check_api_key(key: &str) -> Result<(), String> {
+    if key.starts_with("sk-ant-admin") {
+        Err("That is an Admin key. Batches need an ordinary API key (sk-ant-api…).".into())
+    } else if key.starts_with("sk-ant-") {
+        Ok(())
+    } else {
+        Err("That doesn't look like an API key; they start with sk-ant-.".into())
+    }
+}
+
+/// A GitHub token: fine-grained (github_pat_) or classic (ghp_).
+pub fn check_github_token(token: &str) -> Result<(), String> {
+    if token.starts_with("github_pat_") || token.starts_with("ghp_") || token.starts_with("gho_") {
+        Ok(())
+    } else {
+        Err("That doesn't look like a GitHub token; they start with github_pat_ or ghp_.".into())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,5 +81,9 @@ mod tests {
         assert!(check_admin_key("sk-ant-admin01-x").is_ok());
         assert!(check_admin_key("sk-ant-api03-x").unwrap_err().contains("ordinary"));
         assert!(check_admin_key("hello").is_err());
+        assert!(check_api_key("sk-ant-api03-x").is_ok());
+        assert!(check_api_key("sk-ant-admin01-x").is_err());
+        assert!(check_github_token("github_pat_x").is_ok());
+        assert!(check_github_token("sk-ant-api03-x").is_err());
     }
 }

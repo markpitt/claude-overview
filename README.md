@@ -4,8 +4,8 @@ A small tray app for Windows, Linux and macOS that shows, in one place:
 
 - **Service status** from status.claude.com *(milestone 1)*
 - **Max plan usage** from local Claude Code logs, with the 5-hour block countdown *(milestone 2)*
-- **API credit** spend against the monthly allowance, with a forecast *(milestone 3, this PR)*
-- **What's waiting**: Claude Code sessions, batches in progress and PRs to review *(milestone 4)*
+- **API credit** spend against the monthly allowance, with a forecast *(milestone 3)*
+- **What's waiting**: Claude Code sessions, batches in progress and PRs to review *(milestone 4, this PR)*
 
 Built with [Tauri 2](https://tauri.app) and React + TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 
@@ -50,6 +50,20 @@ Anthropic's cost data lags 4 to 24 hours, so the figures run to the *data refres
 
 ![API credit](docs/screenshots/api.png)
 
+## What's waiting
+
+The Waiting tab, the Overview card and the pop-over list what needs you, from three sources. Each is optional.
+
+**Claude Code sessions.** Press *Add the hooks* on the Waiting tab (or in Settings). That adds `Notification`, `Stop` and `SessionEnd` hooks to `~/.claude/settings.json` (or `$CLAUDE_CONFIG_DIR/settings.json`), each running `claude-overview --hook`. A copy of the file is kept beside it as `settings.json.claude-overview.bak`, and your other settings and hooks are left alone. When Claude Code asks for permission, goes idle or finishes a turn, the hook writes a small marker file in the app's data folder; the session shows as waiting until you carry on in it (its transcript changes) or it ends. *Remove hooks* takes only these entries out again. If the app moves, add the hooks again so they point at the new path.
+
+**Message Batches.** Add an ordinary API key (`sk-ant-api…`) in Settings. Every 5 minutes the app lists batches in that key's workspace and shows those running or ended in the last day, with progress.
+
+**Pull requests.** Add a GitHub [fine-grained token](https://github.com/settings/personal-access-tokens/new) with read-only *Pull requests* access to the repositories you want watched. Every 5 minutes the app searches for open PRs waiting for your review, and your own open PRs that Claude Code opened (their description carries the Claude Code footer).
+
+The API key and token go into the OS keychain like the Admin key. The tab shows a count of sessions and PRs waiting.
+
+![What's waiting](docs/screenshots/waiting.png)
+
 ## Developing
 
 Prerequisites: Node 22, stable Rust, and on Linux the Tauri packages:
@@ -70,6 +84,8 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 
 `CLAUDE_OVERVIEW_API_BASE` points the credit poller at a test server; the API screenshots used a local mock with made-up spend.
 
+`CLAUDE_OVERVIEW_GITHUB_BASE` points the PR search at a test server, and batches use `CLAUDE_OVERVIEW_API_BASE`. The waiting screenshots used the same mock with made-up batches and PRs, and markers written by piping hook JSON into `claude-overview --hook`.
+
 `CLAUDE_OVERVIEW_STATUS_BASE` points the status poller at another feed, which is how the degraded screenshots were made from `src-tauri/tests/fixtures/summary-degraded.json` (a synthetic outage).
 
 ## Layout
@@ -81,7 +97,10 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 | `src-tauri/src/store.rs` | SQLite cache: usage, read positions, settings |
 | `src-tauri/src/cc_service.rs`, `cc_task.rs` | Incremental scan, file watcher, summary for the UI |
 | `src-tauri/src/api_credit.rs`, `api_task.rs` | Cost API fetch, credit period, burn rate and forecast; 30-minute poller |
-| `src-tauri/src/keys.rs` | API keys in the OS keychain |
+| `src-tauri/src/hooks.rs` | Claude Code hooks: `--hook` mode, marker files, adding and removing settings entries |
+| `src-tauri/src/batches.rs`, `github.rs` | Message Batches list; GitHub PR search |
+| `src-tauri/src/waiting_task.rs` | Marker watcher and 5-minute poller for what's waiting |
+| `src-tauri/src/keys.rs` | API keys and the GitHub token in the OS keychain |
 | `src-tauri/src/tray_icon.rs` | Status-coloured tray icons drawn at runtime |
 | `src-tauri/src/lib.rs` | Windows, tray, poller, commands |
 | `src/` | React UI; `App.tsx` picks the pop-over or main window by window label |

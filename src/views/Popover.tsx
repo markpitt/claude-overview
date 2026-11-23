@@ -7,12 +7,14 @@ import { PlanSummary } from "../components/PlanSummary";
 import { CreditSummary } from "../components/CreditSummary";
 import { componentStatusLabel } from "../lib/format";
 import { useNow } from "../lib/useNow";
+import { WaitingList } from "../components/WaitingList";
 
 /** The compact panel opened from the tray. */
 export function Popover() {
   const status = useApp((s) => s.status);
   const cc = useApp((s) => s.cc);
   const api = useApp((s) => s.api);
+  const waiting = useApp((s) => s.waiting);
   const now = useNow();
   const unhealthy = (status?.components ?? []).filter((c) => c.level !== "ok");
 
@@ -57,11 +59,9 @@ export function Popover() {
           <CreditSummary api={api} now={now} compact />
         </section>
       )}
-      <section className="coming">
-        <div>
-          <span>What's waiting</span>
-          <span className="muted small">milestone 4</span>
-        </div>
+      <section>
+        <h3>What's waiting</h3>
+        <WaitingList waiting={waiting} now={now} onSetUp={() => void invoke("show_main")} />
       </section>
     </div>
   );
