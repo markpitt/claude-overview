@@ -27,9 +27,13 @@ pub struct CcState {
 }
 
 impl CcState {
-    pub fn new(store: Store) -> Self {
+    pub fn refresh(&self) {
+        self.refresh.notify_one();
+    }
+
+    pub fn new(store: Arc<Mutex<Store>>) -> Self {
         CcState {
-            store: Arc::new(Mutex::new(store)),
+            store,
             last: Mutex::new(None),
             refresh: Notify::new(),
             folder_changed: Mutex::new(false),

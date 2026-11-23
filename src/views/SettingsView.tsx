@@ -3,6 +3,7 @@ import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import { getVersion } from "@tauri-apps/api/app";
 import { Link } from "../components/Link";
 import { CcSettingsForm } from "../components/CcSettingsForm";
+import { ApiSettingsForm } from "../components/ApiSettingsForm";
 
 export function SettingsView() {
   const [autostart, setAutostart] = useState<boolean | null>(null);
@@ -43,11 +44,14 @@ export function SettingsView() {
         <h2>Max plan and Claude Code</h2>
         <CcSettingsForm />
       </section>
+      <section className="card">
+        <h2>API credit</h2>
+        <ApiSettingsForm />
+      </section>
       <section className="card placeholder">
-        <h2>Keys</h2>
+        <h2>More keys</h2>
         <p className="muted">
-          Admin and standard API keys, the GitHub token and the credit allowance arrive with milestones 3 and 4. Keys
-          will be kept in the OS keychain and never written to disk.
+          A standard API key for batches and the GitHub token arrive with milestone 4, also kept in the OS keychain.
         </p>
       </section>
       <section className="card">

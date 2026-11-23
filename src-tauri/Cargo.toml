@@ -26,6 +26,7 @@ log = "0.4"
 rusqlite = { version = "0.43.0", features = ["bundled"] }
 notify = "9.0.0"
 dirs = "7.0.0"
+keyring = "4.2.0"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = "2"

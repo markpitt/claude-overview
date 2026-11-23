@@ -2,10 +2,22 @@ import { useApp } from "../store";
 import { StatusHeader } from "../components/StatusHeader";
 import { IncidentList } from "../components/IncidentList";
 import { PlanSummary } from "../components/PlanSummary";
+import { CreditSummary } from "../components/CreditSummary";
 import { useNow } from "../lib/useNow";
 import { Placeholder } from "./Placeholder";
 
-export function OverviewView({ onShowStatus, onShowCode }: { onShowStatus: () => void; onShowCode: () => void }) {
+export function OverviewView({
+  onShowStatus,
+  onShowCode,
+  onShowApi,
+  onShowSettings,
+}: {
+  onShowStatus: () => void;
+  onShowCode: () => void;
+  onShowApi: () => void;
+  onShowSettings: () => void;
+}) {
+  const api = useApp((s) => s.api);
   const status = useApp((s) => s.status);
   const cc = useApp((s) => s.cc);
   const now = useNow();
@@ -37,11 +49,15 @@ export function OverviewView({ onShowStatus, onShowCode }: { onShowStatus: () =>
             <p className="muted">Reading Claude Code logs…</p>
           </section>
         )}
-        <Placeholder
-          title="API credit"
-          milestone={3}
-          detail="Spend against the $100 credit (resets on the 17th), burn rate and month-end forecast."
-        />
+        <section className="card">
+          <h2>API credit</h2>
+          <CreditSummary api={api} now={now} compact onSetUp={onShowSettings} />
+          {api?.summary && (
+            <button type="button" className="ghost" onClick={onShowApi}>
+              API spend
+            </button>
+          )}
+        </section>
         <Placeholder
           title="What's waiting"
           milestone={4}

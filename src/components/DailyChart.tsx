@@ -6,7 +6,7 @@ const H = 160;
 const PAD_BOTTOM = 18;
 
 /** Stacked bars of API-price dollars per local day, coloured by model family. */
-export function DailyChart({ days }: { days: Day[] }) {
+export function DailyChart({ days, label = "API-price cost per day for the last 30 days" }: { days: Day[]; label?: string }) {
   const max = Math.max(...days.map((d) => d.costUsd), 0.01);
   const slot = W / days.length;
   const bar = Math.max(2, slot * 0.7);
@@ -14,7 +14,7 @@ export function DailyChart({ days }: { days: Day[] }) {
 
   return (
     <figure className="chart">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="API-price cost per day for the last 30 days">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
         <line x1={0} x2={W} y1={H - PAD_BOTTOM} y2={H - PAD_BOTTOM} className="axis" />
         {days.map((d, i) => {
           let y = H - PAD_BOTTOM;

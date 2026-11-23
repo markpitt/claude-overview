@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { CcSettings, CcSummary, StatusSnapshot } from "./types";
+import type { ApiSettings, ApiSnapshot, CcSettings, CcSummary, StatusSnapshot } from "./types";
 
 interface AppStore {
   status: StatusSnapshot | null;
@@ -11,6 +11,22 @@ interface AppStore {
   ccScanning: boolean;
   rescan: () => Promise<void>;
   saveCcSettings: (s: CcSettings) => Promise<void>;
+  api: ApiSnapshot | null;
+  apiFetching: boolean;
+  refreshApi: () => Promise<void>;
+  saveApiSettings: (s: ApiSettings) => Promise<void>;
+  setAdminKey: (key: string | null) => Promise<void>;
+}
+
+/** Marks a request busy, and clears the flag if it fails (a push clears it on success). */
+async function busy(set: (s: Partial<AppStore>) => void, flag: "ccScanning" | "apiFetching", run: () => Promise<unknown>) {
+  set({ [flag]: true });
+  try {
+    await run();
+  } catch (e) {
+    set({ [flag]: false });
+    throw e;
+  }
 }
 
 export const useApp = create<AppStore>((set) => ({
@@ -22,19 +38,13 @@ export const useApp = create<AppStore>((set) => ({
   },
   cc: null,
   ccScanning: false,
-  rescan: async () => {
-    set({ ccScanning: true });
-    await invoke("refresh_claude_code");
-  },
-  saveCcSettings: async (settings) => {
-    set({ ccScanning: true });
-    try {
-      await invoke("save_cc_settings", { settings });
-    } catch (e) {
-      set({ ccScanning: false });
-      throw e;
-    }
-  },
+  rescan: () => busy(set, "ccScanning", () => invoke("refresh_claude_code")),
+  saveCcSettings: (settings) => busy(set, "ccScanning", () => invoke("save_cc_settings", { settings })),
+  api: null,
+  apiFetching: false,
+  refreshApi: () => busy(set, "apiFetching", () => invoke("refresh_api_credit")),
+  saveApiSettings: (settings) => busy(set, "apiFetching", () => invoke("save_api_settings", { settings })),
+  setAdminKey: (key) => busy(set, "apiFetching", () => invoke("set_admin_key", { key })),
 }));
 
 let started = false;
@@ -49,6 +59,9 @@ export async function startStore(): Promise<void> {
   await listen<CcSummary>("claude-code-updated", (e) => {
     useApp.setState({ cc: e.payload, ccScanning: false });
   });
+  await listen<ApiSnapshot>("api-credit-updated", (e) => {
+    useApp.setState({ api: e.payload, apiFetching: false });
+  });
   const current = await invoke<StatusSnapshot>("get_status");
   // A push may have landed first; keep the newer one.
   const existing = useApp.getState().status;
@@ -59,5 +72,9 @@ export async function startStore(): Promise<void> {
   const ccExisting = useApp.getState().cc;
   if (cc && (!ccExisting || ccExisting.lastScanMs <= cc.lastScanMs)) {
     useApp.setState({ cc });
+  }
+  const api = await invoke<ApiSnapshot>("get_api_credit").catch(() => null);
+  if (api && !useApp.getState().api) {
+    useApp.setState({ api });
   }
 }

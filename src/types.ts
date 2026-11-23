@@ -85,3 +85,38 @@ export interface CcSummary {
   unpricedModels: string[];
   settings: CcSettings;
 }
+
+// API credit. Keep in step with src-tauri/src/api_credit.rs and api_task.rs.
+
+export interface CostRow {
+  dayMs: number;
+  model: string;
+  usd: number;
+}
+
+export interface ApiSettings {
+  allowanceUsd: number;
+  resetDay: number;
+}
+
+export interface CreditSummary {
+  periodStartMs: number;
+  periodEndMs: number;
+  refreshedMs: number | null;
+  spentUsd: number;
+  allowanceUsd: number;
+  burnPerDayUsd: number;
+  forecastUsd: number;
+  runsOutMs: number | null;
+  rows: CostRow[];
+}
+
+export interface ApiSnapshot {
+  configured: boolean;
+  checked: boolean;
+  keyHint: string | null;
+  settings: ApiSettings;
+  summary: CreditSummary | null;
+  fetchedAtMs: number;
+  error: string | null;
+}

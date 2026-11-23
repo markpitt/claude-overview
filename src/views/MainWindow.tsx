@@ -6,6 +6,7 @@ import { StatusView } from "./StatusView";
 import { SettingsView } from "./SettingsView";
 import { Placeholder } from "./Placeholder";
 import { ClaudeCodeView } from "./ClaudeCodeView";
+import { ApiView } from "./ApiView";
 
 type Tab = "overview" | "api" | "code" | "waiting" | "status" | "settings";
 
@@ -42,10 +43,15 @@ export function MainWindow() {
       <main className="content">
         <h1>{TABS.find((t) => t.id === tab)?.label}</h1>
         {tab === "overview" && (
-          <OverviewView onShowStatus={() => setTab("status")} onShowCode={() => setTab("code")} />
+          <OverviewView
+            onShowStatus={() => setTab("status")}
+            onShowCode={() => setTab("code")}
+            onShowApi={() => setTab("api")}
+            onShowSettings={() => setTab("settings")}
+          />
         )}
         {tab === "api" && (
-          <Placeholder title="API credit and usage" milestone={3} detail="Needs an Admin API key from platform.claude.com." />
+          <ApiView onShowSettings={() => setTab("settings")} />
         )}
         {tab === "code" && <ClaudeCodeView />}
         {tab === "waiting" && (
