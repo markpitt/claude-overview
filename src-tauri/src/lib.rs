@@ -5,13 +5,17 @@
 
 mod api_credit;
 mod api_task;
+mod batches;
 mod cc_service;
 mod cc_task;
 mod claude_code;
+mod github;
+mod hooks;
 mod keys;
 mod status;
 mod store;
 mod tray_icon;
+mod waiting_task;
 
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -221,6 +225,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 app.state::<AppState>().refresh.notify_one();
                 app.state::<cc_task::CcState>().refresh();
                 app.state::<api_task::ApiState>().refresh();
+                app.state::<waiting_task::WaitingState>().refresh();
             }
             "quit" => app.exit(0),
             _ => {}
@@ -242,6 +247,12 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Run as a Claude Code hook: record the event and exit, no window.
+    if std::env::args().nth(1).as_deref() == Some(hooks::HOOK_ARG) {
+        hooks::run_cli();
+        return;
+    }
+
     let mut builder = tauri::Builder::default();
 
     #[cfg(desktop)]
@@ -278,7 +289,11 @@ pub fn run() {
             api_task::get_api_credit,
             api_task::refresh_api_credit,
             api_task::save_api_settings,
-            api_task::set_admin_key
+            api_task::set_admin_key,
+            waiting_task::get_waiting,
+            waiting_task::refresh_waiting,
+            waiting_task::set_waiting_key,
+            waiting_task::set_hooks
         ])
         .setup(|app| {
             // A tray app: no Dock icon on macOS.
@@ -293,11 +308,13 @@ pub fn run() {
             let store = Arc::new(Mutex::new(store));
             app.manage(cc_task::CcState::new(store.clone()));
             app.manage(api_task::ApiState::new(store));
+            app.manage(waiting_task::WaitingState::new());
 
             build_tray(app.handle())?;
             spawn_status_poller(app.handle().clone());
             cc_task::spawn(app.handle().clone());
             api_task::spawn(app.handle().clone());
+            waiting_task::spawn(app.handle().clone());
 
             // Started by hand: show the window, since on GNOME without the
             // AppIndicator extension there is no tray icon to click.

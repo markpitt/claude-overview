@@ -34,7 +34,7 @@ body { margin: 0; background: var(--bg); }
 h1 { font-size: 20px; margin: 0 0 16px; }
 h2 { font-size: 14px; margin: 0 0 10px; }
 h3 { font-size: 12px; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent); text-decoration: none; cursor: pointer; }
 a:hover { text-decoration: underline; }
 .muted { color: var(--muted); }
 .small { font-size: 12px; }
@@ -140,8 +140,6 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .popover { padding: 12px; display: flex; flex-direction: column; gap: 4px; height: 100vh; overflow-y: auto; }
 .popover-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .popover .brand { font-weight: 700; }
-.coming { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
-.coming > div { display: flex; justify-content: space-between; padding: 4px 0; color: var(--muted); }
 
 /* Claude Code usage */
 :root {
@@ -207,3 +205,33 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .flush { margin: 0; }
 .gap-top { margin-top: 10px; }
+
+/* What's waiting */
+.waiting { list-style: none; margin: 0 0 8px; padding: 0; }
+.waiting li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); }
+.waiting li:first-child { border-top: none; }
+.waiting.compact li { padding: 4px 0; }
+.waiting:not(.compact) .tag { min-width: 118px; text-align: center; }
+.waiting.compact .tag { min-width: 78px; text-align: center; }
+.waiting .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.waiting .name > div, .waiting .name > code { display: block; overflow: hidden; text-overflow: ellipsis; }
+.waiting .repo { flex: none; white-space: nowrap; }
+.clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag {
+  flex: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: var(--border);
+  color: var(--text);
+}
+.tag-permission, .tag-question { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
+.tag-idle { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+.tag-finished { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.tag-review { background: color-mix(in srgb, var(--fam-mythos) 20%, transparent); color: var(--fam-mythos); }
+.tag-claude { background: color-mix(in srgb, var(--fam-opus) 20%, transparent); color: var(--fam-opus); }
+.tag-batch { background: color-mix(in srgb, var(--fam-sonnet) 20%, transparent); color: var(--fam-sonnet); }
+.badge { flex: none; font-size: 11px; color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 5px; }
+.count { font-size: 11px; font-weight: 600; min-width: 18px; text-align: center; padding: 0 5px; border-radius: 9px; background: var(--bad); color: #fff; }

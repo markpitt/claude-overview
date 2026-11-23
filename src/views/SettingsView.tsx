@@ -4,6 +4,7 @@ import { getVersion } from "@tauri-apps/api/app";
 import { Link } from "../components/Link";
 import { CcSettingsForm } from "../components/CcSettingsForm";
 import { ApiSettingsForm } from "../components/ApiSettingsForm";
+import { WaitingSettingsForm } from "../components/WaitingSettingsForm";
 
 export function SettingsView() {
   const [autostart, setAutostart] = useState<boolean | null>(null);
@@ -48,11 +49,10 @@ export function SettingsView() {
         <h2>API credit</h2>
         <ApiSettingsForm />
       </section>
-      <section className="card placeholder">
-        <h2>More keys</h2>
-        <p className="muted">
-          A standard API key for batches and the GitHub token arrive with milestone 4, also kept in the OS keychain.
-        </p>
+      <section className="card">
+        <h2>What's waiting</h2>
+        <WaitingSettingsForm />
+        <p className="muted small">Keys and tokens are kept in the OS keychain, never on disk.</p>
       </section>
       <section className="card">
         <h2>About</h2>
