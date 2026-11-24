@@ -33,3 +33,41 @@ describe("duration", () => {
     expect(duration("2026-11-23T09:00:00Z", "2026-11-23T11:00:00Z")).toBe("2 h");
   });
 });
+
+describe("en-GB formats", () => {
+  it("separates thousands", async () => {
+    const { formatCount } = await import("./format");
+    expect(formatCount(1360)).toBe("1,360");
+  });
+  it("writes day and month as 17/12", async () => {
+    const { dayMonth } = await import("./format");
+    expect(dayMonth(new Date(2026, 11, 17).getTime())).toBe("17/12");
+  });
+  it("uses a 24-hour clock", async () => {
+    const { clockTime } = await import("./usage");
+    expect(clockTime(new Date(2026, 11, 8, 14, 0).getTime())).toBe("14:00");
+  });
+});
+
+describe("short dates", () => {
+  it("has no comma after the weekday", async () => {
+    const { shortDate } = await import("./format");
+    expect(shortDate(Date.UTC(2026, 11, 8, 12), "UTC")).toBe("Tue 8 Dec");
+  });
+});
+
+describe("display helpers", () => {
+  it("shortens a home folder to ~", async () => {
+    const { tildePath } = await import("./format");
+    expect(tildePath("/home/mark/.claude/projects")).toBe("~/.claude/projects");
+    expect(tildePath("C:\\Users\\Mark\\.claude\\projects")).toBe("~\\.claude\\projects");
+    expect(tildePath("/srv/claude/projects")).toBe("/srv/claude/projects");
+  });
+  it("puts Statuspage headlines in sentence case", async () => {
+    const { sentenceCase } = await import("./format");
+    expect(sentenceCase("All Systems Operational")).toBe("All systems operational");
+    expect(sentenceCase("Partial System Outage")).toBe("Partial system outage");
+    expect(sentenceCase("Major System Outage")).toBe("Major system outage");
+    expect(sentenceCase("Elevated errors on API")).toBe("Elevated errors on API");
+  });
+});

@@ -2,6 +2,7 @@ import { useApp } from "../store";
 import { StatusHeader } from "../components/StatusHeader";
 import { ComponentList } from "../components/ComponentList";
 import { IncidentList } from "../components/IncidentList";
+import { CardHead } from "../components/CardHead";
 import { Link } from "../components/Link";
 
 export function StatusView() {
@@ -10,23 +11,22 @@ export function StatusView() {
     <div className="stack">
       <StatusHeader />
       <section className="card">
-        <h2>Active incidents</h2>
+        <CardHead title="Active incidents" />
         <IncidentList incidents={status?.activeIncidents ?? []} empty="No active incidents." showUpdate />
       </section>
       <section className="card">
-        <h2>Services</h2>
+        <CardHead title="Services" />
         <ComponentList components={status?.components ?? []} />
       </section>
       <section className="card">
-        <h2>Scheduled maintenance</h2>
+        <CardHead title="Scheduled maintenance" />
         <IncidentList incidents={status?.maintenance ?? []} empty="Nothing scheduled." kind="maintenance" />
       </section>
       <section className="card">
-        <h2>Recent incidents</h2>
+        <CardHead title="Recent incidents">
+          <Link href="https://status.claude.com">Full history</Link>
+        </CardHead>
         <IncidentList incidents={status?.recentIncidents ?? []} empty="No recent incidents." />
-        <p className="small">
-          Full history at <Link href="https://status.claude.com">status.claude.com</Link>
-        </p>
       </section>
     </div>
   );

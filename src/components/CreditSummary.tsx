@@ -1,27 +1,34 @@
 import type { ApiSnapshot } from "../types";
 import { daysUntil, utcDate } from "../lib/credit";
-import { formatUsd, share } from "../lib/usage";
+import { dayMonth } from "../lib/format";
+import { clockTime, formatUsd, share } from "../lib/usage";
+import { Chip } from "./Chip";
 import { Meter } from "./Meter";
 
-/** Spend against the monthly credit, with the forecast. Renders a prompt when no key is set. */
+/**
+ * Spend against the monthly credit, with the forecast. Renders a prompt when no key is set.
+ * `compact` stacks the items for a card or the pop-over; `forecast` adds the forecast item there.
+ */
 export function CreditSummary({
   api,
   now,
   compact = false,
+  forecast = false,
   onSetUp,
 }: {
   api: ApiSnapshot | null;
   now: number;
   compact?: boolean;
+  forecast?: boolean;
   onSetUp?: () => void;
 }) {
-  if (!api || !api.checked) return <p className="muted small">Checking…</p>;
+  if (!api || !api.checked) return <p className="meta">Checking…</p>;
   if (!api.configured) {
     return (
-      <div className="small">
-        <p className="muted">Add an Admin API key to see spend against your credit.</p>
+      <div className="prompt">
+        <p className="meta">Add an Admin API key to see spend against your credit.</p>
         {onSetUp && (
-          <button type="button" className="ghost" onClick={onSetUp}>
+          <button type="button" onClick={onSetUp}>
             Add key
           </button>
         )}
@@ -30,57 +37,62 @@ export function CreditSummary({
   }
   const s = api.summary;
   if (!s) {
-    return api.error ? <p className="error small">{api.error}</p> : <p className="muted small">Fetching…</p>;
+    return api.error ? <p className="error">{api.error}</p> : <p className="meta">Fetching…</p>;
   }
   const used = share(s.spentUsd, s.allowanceUsd) ?? 0;
   const left = s.allowanceUsd - s.spentUsd;
   const reset = daysUntil(s.periodEndMs, now);
+  const leftText = left >= 0 ? `${formatUsd(left)} left` : `${formatUsd(-left)} over`;
+  const runsOut = s.runsOutMs ? (
+    <Chip tone="danger" symbol="!">
+      Runs out around {utcDate(s.runsOutMs)}
+    </Chip>
+  ) : null;
+  const showForecast = !compact || forecast;
 
   return (
-    <div className={compact ? "plan compact" : "plan"}>
-      <div className="plan-item">
-        <div className="plan-head">
+    <div className={compact ? "items compact" : "items columns"}>
+      <div className="item">
+        <div className="item-head">
           <span>This month</span>
-          <span className="muted small">
+          <span className="meta">
             resets in {reset} day{reset === 1 ? "" : "s"}
+            <span className="optional">, on {dayMonth(s.periodEndMs, "UTC")}</span>
           </span>
         </div>
-        <div className="plan-figure">
+        <div className="figure">
           {formatUsd(s.spentUsd)}
-          <span className="muted"> of {formatUsd(s.allowanceUsd)}</span>
+          <span className="of"> of {formatUsd(s.allowanceUsd)}</span>
         </div>
         <Meter value={used} label="Share of the API credit used" />
-        <div className="muted small plan-detail">
-          {left >= 0 ? `${formatUsd(left)} left` : `${formatUsd(-left)} over`}
+        <div className="meta detail optional">
+          {leftText}
+          {compact && s.refreshedMs ? ` · data refreshed ${clockTime(s.refreshedMs)}` : ""}
         </div>
+        {compact && !forecast && runsOut && <div className="detail">{runsOut}</div>}
       </div>
       {!compact && (
-        <>
-          <div className="plan-item">
-            <div className="plan-head">
-              <span>Burn rate</span>
-              <span className="muted small">this period</span>
-            </div>
-            <div className="plan-figure">
-              {formatUsd(s.burnPerDayUsd)}
-              <span className="muted small"> a day</span>
-            </div>
+        <div className="item">
+          <div className="item-head">
+            <span>Burn rate</span>
+            <span className="meta">this period</span>
           </div>
-          <div className="plan-item">
-            <div className="plan-head">
-              <span>Forecast</span>
-              <span className="muted small">at {utcDate(s.periodEndMs)}</span>
-            </div>
-            <div className={s.forecastUsd > s.allowanceUsd ? "plan-figure state-bad" : "plan-figure"}>
-              {formatUsd(s.forecastUsd)}
-            </div>
-            <div className="muted small plan-detail">
-              {s.runsOutMs ? `Runs out around ${utcDate(s.runsOutMs)}` : "Within the credit at this rate"}
-            </div>
+          <div className="figure">
+            {formatUsd(s.burnPerDayUsd)}
+            <span className="of"> a day</span>
           </div>
-        </>
+        </div>
       )}
-      {compact && s.runsOutMs && <div className="small state-bad">Runs out around {utcDate(s.runsOutMs)}</div>}
+      {showForecast && (
+        <div className="item">
+          <div className="item-head">
+            <span>Forecast at {dayMonth(s.periodEndMs, "UTC")}</span>
+            {compact && <span className="meta">{formatUsd(s.burnPerDayUsd)} a day</span>}
+          </div>
+          <div className="figure">{formatUsd(s.forecastUsd)}</div>
+          <div className="detail">{runsOut ?? <span className="meta">Within the credit at this rate</span>}</div>
+        </div>
+      )}
     </div>
   );
 }

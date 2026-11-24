@@ -1,4 +1,5 @@
 import type { Batch, Marker, WaitingSnapshot } from "../types";
+import { formatCount } from "./format";
 
 /** Plain words for why a session is waiting. */
 export function markerLabel(kind: Marker["kind"]): string {
@@ -37,8 +38,9 @@ export function batchProgress(b: Batch): string {
   const c = b.counts;
   const total = c.processing + c.succeeded + c.errored + c.canceled + c.expired;
   const failed = c.errored + c.expired;
-  if (isRunning(b)) return `${total - c.processing} of ${total} done`;
-  return failed > 0 ? `${c.succeeded} done, ${failed} failed` : `${c.succeeded} done`;
+  const n = formatCount;
+  if (isRunning(b)) return `${n(total - c.processing)} of ${n(total)} done`;
+  return failed > 0 ? `${n(c.succeeded)} done, ${n(failed)} failed` : `${n(c.succeeded)} done`;
 }
 
 export interface WaitingCounts {

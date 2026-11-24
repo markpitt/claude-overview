@@ -15,7 +15,7 @@ function toNumber(s: string): number | null {
 export function CcSettingsForm() {
   const cc = useApp((s) => s.cc);
   const save = useApp((s) => s.saveCcSettings);
-  if (!cc) return <p className="muted small">Loading…</p>;
+  if (!cc) return <p className="meta">Loading…</p>;
   // Remount when the saved settings change so the fields show them.
   return <Form key={JSON.stringify(cc.settings)} initial={cc.settings} defaultFolder={cc.folder} save={save} />;
 }
@@ -61,7 +61,7 @@ function Form({
           placeholder={initial.folderOverride ? "" : (defaultFolder ?? "~/.claude/projects")}
           onChange={(e) => setFolder(e.target.value)}
         />
-        <small className="muted">Leave empty for the default. The folder that holds one folder per project.</small>
+        <small className="meta">Leave empty for the default. The folder that holds one folder per project.</small>
       </label>
       <label>
         <span>5-hour block allowance ($ at API prices)</span>
@@ -75,13 +75,13 @@ function Form({
         <span>Plan price per month ($)</span>
         <input type="number" min="0" step="any" value={plan} onChange={(e) => setPlan(e.target.value)} />
       </label>
-      <p className="muted small">
+      <p className="meta">
         Anthropic doesn't publish Max plan limits. Note what a block cost when you last hit a limit and use that as
         your allowance.
       </p>
       <div className="row">
         <button type="submit">Save</button>
-        {message && <span className="small muted">{message}</span>}
+        {message && <span className="meta">{message}</span>}
       </div>
     </form>
   );

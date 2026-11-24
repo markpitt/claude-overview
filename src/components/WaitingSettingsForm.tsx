@@ -11,7 +11,7 @@ export function WaitingSettingsForm() {
   const [token, setToken] = useState("");
   const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null);
 
-  if (!w) return <p className="muted small">Loading…</p>;
+  if (!w) return <p className="meta">Loading…</p>;
 
   async function run(action: () => Promise<void>, done: string) {
     setMessage(null);
@@ -37,17 +37,17 @@ export function WaitingSettingsForm() {
     <form className="form" onSubmit={(e) => void onSubmit(e)}>
       <label>
         <span>Claude Code hooks</span>
-        <span className="row small">
+        <span className="row">
           {w.hooks.installed ? "Added to Claude Code's settings." : "Not added."}
           <button
             type="button"
-            className="ghost"
+            className={w.hooks.installed ? "danger" : undefined}
             onClick={() => void run(() => setHooks(!w.hooks.installed), w.hooks.installed ? "Hooks removed." : "Hooks added.")}
           >
-            {w.hooks.installed ? "Remove hooks" : "Add hooks"}
+            {w.hooks.installed ? "Remove the Claude Code hooks" : "Add hooks"}
           </button>
         </span>
-        <small className="muted">
+        <small className="meta">
           In <code>{w.hooks.settingsPath ?? "~/.claude/settings.json"}</code>, with a backup beside it.
         </small>
       </label>
@@ -61,7 +61,7 @@ export function WaitingSettingsForm() {
           placeholder={w.batches.configured ? `Saved (${w.batches.keyHint ?? ""}); paste a new one to replace it` : "sk-ant-api…"}
           onChange={(e) => setApiKey(e.target.value)}
         />
-        <small className="muted">
+        <small className="meta">
           An ordinary key from <Link href="https://platform.claude.com/settings/keys">Console settings, API keys</Link>,
           in the workspace that runs your batches.
         </small>
@@ -76,7 +76,7 @@ export function WaitingSettingsForm() {
           placeholder={w.prs.configured ? `Saved (${w.prs.keyHint ?? ""}); paste a new one to replace it` : "github_pat_…"}
           onChange={(e) => setToken(e.target.value)}
         />
-        <small className="muted">
+        <small className="meta">
           A <Link href="https://github.com/settings/personal-access-tokens/new">fine-grained token</Link> with read-only
           Pull requests access to the repositories you want watched.
         </small>
@@ -84,17 +84,17 @@ export function WaitingSettingsForm() {
       <div className="row">
         <button type="submit">Save</button>
         {w.batches.configured && (
-          <button type="button" className="ghost" onClick={() => void run(() => setKey("api", null), "API key removed.")}>
-            Remove API key
+          <button type="button" className="danger" onClick={() => void run(() => setKey("api", null), "API key removed.")}>
+            Remove the API key
           </button>
         )}
         {w.prs.configured && (
-          <button type="button" className="ghost" onClick={() => void run(() => setKey("github", null), "Token removed.")}>
-            Remove token
+          <button type="button" className="danger" onClick={() => void run(() => setKey("github", null), "Token removed.")}>
+            Remove the GitHub token
           </button>
         )}
       </div>
-      {message && <p className={message.error ? "small error" : "small muted"}>{message.text}</p>}
+      {message && <p className={message.error ? "error" : "meta"}>{message.text}</p>}
     </form>
   );
 }

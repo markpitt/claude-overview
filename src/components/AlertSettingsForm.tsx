@@ -20,7 +20,7 @@ export function AlertSettingsForm() {
       .catch((e) => setMessage({ text: String(e), error: true }));
   }, []);
 
-  if (!settings) return <p className="muted small">Loading…</p>;
+  if (!settings) return <p className="meta">Loading…</p>;
 
   async function save(next: AlertSettings, done: string) {
     setMessage(null);
@@ -67,14 +67,14 @@ export function AlertSettingsForm() {
             </option>
           ))}
         </select>
-        <small className="muted">Plan alerts need your allowance estimates in the section above.</small>
+        <small className="meta">Plan alerts need your allowance estimates in the section above.</small>
       </label>
       <div className="row">
-        <button type="button" className="ghost" onClick={() => void test()}>
+        <button type="button" onClick={() => void test()}>
           Send a test notification
         </button>
       </div>
-      {message && <p className={message.error ? "small error" : "small muted"}>{message.text}</p>}
+      {message && <p className={message.error ? "error" : "meta"}>{message.text}</p>}
     </div>
   );
 }

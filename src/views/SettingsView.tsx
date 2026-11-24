@@ -8,6 +8,7 @@ import { WaitingSettingsForm } from "../components/WaitingSettingsForm";
 import { AlertSettingsForm } from "../components/AlertSettingsForm";
 import { HotkeyForm } from "../components/HotkeyForm";
 import { UpdatesPanel } from "../components/UpdatesPanel";
+import { CardHead } from "../components/CardHead";
 
 export function SettingsView() {
   const [autostart, setAutostart] = useState<boolean | null>(null);
@@ -32,8 +33,8 @@ export function SettingsView() {
   return (
     <div className="stack">
       <section className="card">
-        <h2>General</h2>
-        <label className="row">
+        <CardHead title="General" />
+        <label className="check">
           <input
             type="checkbox"
             checked={autostart ?? false}
@@ -42,36 +43,36 @@ export function SettingsView() {
           />
           Start at login, in the tray
         </label>
-        {error && <p className="error small">{error}</p>}
+        {error && <p className="error">{error}</p>}
       </section>
       <section className="card">
-        <h2>Max plan and Claude Code</h2>
+        <CardHead title="Max plan and Claude Code" />
         <CcSettingsForm />
       </section>
       <section className="card">
-        <h2>API credit</h2>
+        <CardHead title="API credit" />
         <ApiSettingsForm />
       </section>
       <section className="card">
-        <h2>What's waiting</h2>
+        <CardHead title="What's waiting" />
         <WaitingSettingsForm />
-        <p className="muted small">Keys and tokens are kept in the OS keychain, never on disk.</p>
+        <p className="meta note">Keys and tokens are kept in the OS keychain, never on disk.</p>
       </section>
       <section className="card">
-        <h2>Alerts</h2>
+        <CardHead title="Alerts" />
         <AlertSettingsForm />
       </section>
       <section className="card">
-        <h2>Keyboard shortcut</h2>
+        <CardHead title="Keyboard shortcut" />
         <HotkeyForm />
       </section>
       <section className="card">
-        <h2>Updates</h2>
+        <CardHead title="Updates" />
         <UpdatesPanel />
       </section>
       <section className="card">
-        <h2>About</h2>
-        <p className="small">
+        <CardHead title="About" />
+        <p>
           Claude Overview {version && `v${version}`}. Source and releases at{" "}
           <Link href="https://github.com/markpitt/claude-overview">github.com/markpitt/claude-overview</Link>.
         </p>

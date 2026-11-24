@@ -1,9 +1,10 @@
 import { useApp } from "../store";
 import { useNow } from "../lib/useNow";
 import { byLocalDay, byProject, DAY_MS, formatTokens, formatUsd } from "../lib/usage";
-import { relativeTime } from "../lib/format";
+import { formatCount, relativeTime, tildePath } from "../lib/format";
 import { PlanSummary } from "../components/PlanSummary";
-import { DailyChart } from "../components/DailyChart";
+import { DailyChart, peakUsd } from "../components/DailyChart";
+import { CardHead, TabLink } from "../components/CardHead";
 
 export function ClaudeCodeView() {
   const cc = useApp((s) => s.cc);
@@ -12,32 +13,34 @@ export function ClaudeCodeView() {
   const now = useNow();
 
   if (!cc) {
-    return <p className="muted">Reading Claude Code logs…</p>;
+    return <p className="meta">Reading Claude Code logs…</p>;
   }
 
   const days = byLocalDay(cc.hourly, 30, now);
   const projects = byProject(cc.hourly, now - 30 * DAY_MS);
   const noData = cc.hourly.length === 0;
+  const peak = peakUsd(days);
 
   return (
     <div className="stack">
-      <section className="card">
-        <h2>Max plan</h2>
+      <p className="page-meta">
+        From the transcripts in <code>{cc.folder ? tildePath(cc.folder) : "none"}</code>
+        {!cc.folderExists && <span className="error"> (not found)</span>} · {formatCount(cc.files)} files read ·{" "}
+        {scanning ? <span>Scanning…</span> : <TabLink onClick={() => void rescan()}>Rescan</TabLink>}
+      </p>
+
+      <section className="card" aria-label="Max plan">
         <PlanSummary cc={cc} now={now} />
-        <p className="muted small note">
-          Costs are what this usage would cost at API prices. Anthropic does not publish Max plan limits, so the
-          block window and allowances are estimates; set your own in Settings. claude.ai chats are not included.
-        </p>
       </section>
 
       <section className="card">
-        <h2>Last 30 days</h2>
-        {noData ? <p className="muted">No Claude Code usage found yet.</p> : <DailyChart days={days} />}
+        <CardHead title="Last 30 days">{peak > 0 && <span className="meta">peak {formatUsd(peak)} a day</span>}</CardHead>
+        {noData ? <p className="meta">No Claude Code usage found yet.</p> : <DailyChart days={days} />}
       </section>
 
       {projects.length > 0 && (
         <section className="card">
-          <h2>Projects, last 30 days</h2>
+          <CardHead title="Projects, last 30 days" />
           <table className="table">
             <thead>
               <tr>
@@ -51,11 +54,11 @@ export function ClaudeCodeView() {
             <tbody>
               {projects.map((p) => (
                 <tr key={p.project}>
-                  <td>{p.project}</td>
+                  <td className="mono">{p.project}</td>
                   <td className="num">{formatUsd(p.costUsd)}</td>
                   <td className="num">{formatTokens(p.tokens)}</td>
-                  <td className="num">{p.messages}</td>
-                  <td className="num muted">{relativeTime(p.lastMs, now)}</td>
+                  <td className="num">{formatCount(p.messages)}</td>
+                  <td className="num meta">{relativeTime(p.lastMs, now)}</td>
                 </tr>
               ))}
             </tbody>
@@ -64,25 +67,19 @@ export function ClaudeCodeView() {
       )}
 
       <section className="card health">
-        <div className="row">
-          <h2>Log reader</h2>
-          <span className="spacer" />
-          <button type="button" className="ghost" disabled={scanning} onClick={() => void rescan()}>
-            {scanning ? "Scanning…" : "Rescan"}
-          </button>
-        </div>
-        <dl className="facts small">
+        <CardHead title="Log reader" />
+        <dl className="facts">
           <dt>Folder</dt>
           <dd>
-            <code>{cc.folder ?? "none"}</code>
+            <code>{cc.folder ? tildePath(cc.folder) : "none"}</code>
             {!cc.folderExists && <span className="error"> (not found)</span>}
           </dd>
           <dt>Transcripts</dt>
-          <dd>{cc.files} files</dd>
+          <dd>{formatCount(cc.files)} files</dd>
           <dt>Lines read</dt>
           <dd>
-            {cc.linesParsed.toLocaleString()} since the app started
-            {cc.linesSkipped > 0 && `, ${cc.linesSkipped} unreadable and skipped`}
+            {formatCount(cc.linesParsed)} since the app started
+            {cc.linesSkipped > 0 && `, ${formatCount(cc.linesSkipped)} unreadable and skipped`}
           </dd>
           <dt>Last scan</dt>
           <dd>{relativeTime(cc.lastScanMs, now)}</dd>
@@ -93,7 +90,11 @@ export function ClaudeCodeView() {
             </>
           )}
         </dl>
-        {cc.error && <p className="error small">{cc.error}</p>}
+        {cc.error && <p className="error">{cc.error}</p>}
+        <p className="meta note">
+          Costs are what this usage would cost at API prices. Anthropic does not publish Max plan limits, so the
+          block window and allowances are estimates; set your own in Settings. claude.ai chats are not included.
+        </p>
       </section>
     </div>
   );
