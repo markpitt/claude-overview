@@ -100,7 +100,7 @@ pub async fn fetch(client: &reqwest::Client, key: &str, now_ms: i64) -> Result<V
             .header("anthropic-version", VERSION)
             .send()
             .await
-            .map_err(|e| format!("Could not reach the Anthropic API: {}.", e.without_url()))?;
+            .map_err(|e| format!("Couldn't reach the Anthropic API: {}.", e.without_url()))?;
         let status = resp.status();
         let body = resp.text().await.map_err(|e| format!("Reading the batches response: {}.", e.without_url()))?;
         if !status.is_success() {
