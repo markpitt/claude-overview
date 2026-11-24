@@ -6,7 +6,7 @@ import { Link } from "./Link";
 /** Admin key (kept in the OS keychain) and the credit allowance. */
 export function ApiSettingsForm() {
   const api = useApp((s) => s.api);
-  if (!api) return <p className="muted small">Loading…</p>;
+  if (!api) return <p className="meta">Loading…</p>;
   return <Form key={`${api.settings.allowanceUsd}-${api.settings.resetDay}-${api.keyHint}`} api={api} />;
 }
 
@@ -49,7 +49,7 @@ function Form({ api }: { api: ApiSnapshot }) {
           placeholder={api.configured ? `Saved (${api.keyHint ?? ""}); paste a new one to replace it` : "sk-ant-admin…"}
           onChange={(e) => setKeyText(e.target.value)}
         />
-        <small className="muted">
+        <small className="meta">
           Create one under <Link href="https://platform.claude.com/settings/admin-keys">Console settings, Admin keys</Link>.
           It is kept in the OS keychain and only sent to api.anthropic.com.
         </small>
@@ -65,11 +65,11 @@ function Form({ api }: { api: ApiSnapshot }) {
       <div className="row">
         <button type="submit">Save</button>
         {api.configured && (
-          <button type="button" className="ghost" onClick={() => void run(() => setKey(null), "Key removed.")}>
-            Remove key
+          <button type="button" className="danger" onClick={() => void run(() => setKey(null), "Key removed.")}>
+            Remove the Admin key
           </button>
         )}
-        {message && <span className={message.error ? "small error" : "small muted"}>{message.text}</span>}
+        {message && <span className={message.error ? "error" : "meta"}>{message.text}</span>}
       </div>
     </form>
   );

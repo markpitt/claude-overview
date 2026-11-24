@@ -4,7 +4,8 @@ import { byModel, creditDays } from "../lib/credit";
 import { formatUsd } from "../lib/usage";
 import { relativeTime, shortDateTime } from "../lib/format";
 import { CreditSummary } from "../components/CreditSummary";
-import { DailyChart } from "../components/DailyChart";
+import { DailyChart, peakUsd } from "../components/DailyChart";
+import { CardHead } from "../components/CardHead";
 import { Link } from "../components/Link";
 
 export function ApiView({ onShowSettings }: { onShowSettings: () => void }) {
@@ -13,24 +14,22 @@ export function ApiView({ onShowSettings }: { onShowSettings: () => void }) {
   const refresh = useApp((s) => s.refreshApi);
   const now = useNow();
   const s = api?.summary;
+  const days = s ? creditDays(s.rows, s.periodStartMs, s.periodEndMs, now) : [];
+  const peak = peakUsd(days);
 
   return (
     <div className="stack">
       <section className="card">
-        <div className="row">
-          <h2 className="flush">API credit</h2>
-          <span className="spacer" />
+        <CardHead title="API credit">
           {api?.configured && (
-            <button type="button" className="ghost" disabled={fetching} onClick={() => void refresh()}>
+            <button type="button" disabled={fetching} onClick={() => void refresh()}>
               {fetching ? "Fetching…" : "Refresh"}
             </button>
           )}
-        </div>
-        <div className="gap-top">
-          <CreditSummary api={api} now={now} onSetUp={onShowSettings} />
-        </div>
-        {api?.error && s && <p className="error small">{api.error} Showing the last figures.</p>}
-        <p className="muted small note">
+        </CardHead>
+        <CreditSummary api={api} now={now} onSetUp={onShowSettings} />
+        {api?.error && s && <p className="error">{api.error} Showing the last figures.</p>}
+        <p className="meta note">
           Spend at your organisation's prices before credits, from the Usage and Cost Analytics API.{" "}
           {s?.refreshedMs
             ? `Anthropic's data runs to ${shortDateTime(new Date(s.refreshedMs).toISOString())}; it lags 4 to 24 hours.`
@@ -42,14 +41,16 @@ export function ApiView({ onShowSettings }: { onShowSettings: () => void }) {
 
       {s && (
         <section className="card">
-          <h2>Each day this period</h2>
-          <DailyChart days={creditDays(s.rows, s.periodStartMs, s.periodEndMs, now)} label="API spend per day this credit period" />
+          <CardHead title="Each day this period">
+            {peak > 0 && <span className="meta">peak {formatUsd(peak)} a day</span>}
+          </CardHead>
+          <DailyChart days={days} label="API spend per day this credit period" />
         </section>
       )}
 
       {s && s.rows.length > 0 && (
         <section className="card">
-          <h2>By model</h2>
+          <CardHead title="By model" />
           <table className="table">
             <thead>
               <tr>
@@ -61,9 +62,9 @@ export function ApiView({ onShowSettings }: { onShowSettings: () => void }) {
             <tbody>
               {byModel(s.rows).map((m) => (
                 <tr key={m.model}>
-                  <td>{m.model}</td>
+                  <td className="mono">{m.model}</td>
                   <td className="num">{formatUsd(m.usd)}</td>
-                  <td className="num muted">{s.spentUsd > 0 ? `${Math.round((m.usd / s.spentUsd) * 100)}%` : ""}</td>
+                  <td className="num meta">{s.spentUsd > 0 ? `${Math.round((m.usd / s.spentUsd) * 100)}%` : ""}</td>
                 </tr>
               ))}
             </tbody>

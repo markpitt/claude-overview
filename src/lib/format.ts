@@ -62,15 +62,29 @@ export function duration(fromIso: string, toIso: string | null, nowMs: number = 
   return m ? `${h} h ${m} min` : `${h} h`;
 }
 
-/** "Mon 23 Nov, 09:49" in the user's locale and time zone. */
+/** "Mon 23 Nov, 09:49" in en-GB, in the local time zone, on a 24-hour clock. */
 export function shortDateTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString(undefined, {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+  return `${shortDate(d.getTime())}, ${time}`;
+}
+
+/** "Tue 8 Dec": built from parts, since engines differ on the comma after the weekday. */
+export function shortDate(ms: number, timeZone?: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone }).formatToParts(
+    new Date(ms),
+  );
+  const part = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${part("weekday")} ${part("day")} ${part("month")}`;
+}
+
+/** "17/12" for a local day. */
+export function dayMonth(ms: number): string {
+  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "2-digit" });
+}
+
+/** "1,360": a count with thousands separators. */
+export function formatCount(n: number): string {
+  return n.toLocaleString("en-GB");
 }

@@ -115,5 +115,5 @@ export function share(used: number, limit: number | null): number | null {
 
 /** Local time of day, "14:05". */
 export function clockTime(ms: number): string {
-  return new Date(ms).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return new Date(ms).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 }

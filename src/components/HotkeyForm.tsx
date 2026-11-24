@@ -18,7 +18,7 @@ export function HotkeyForm() {
       .catch((e) => setMessage({ text: String(e), error: true }));
   }, []);
 
-  if (!status) return <p className="muted small">Loading…</p>;
+  if (!status) return <p className="meta">Loading…</p>;
 
   async function save(accelerator: string) {
     setMessage(null);
@@ -57,23 +57,23 @@ export function HotkeyForm() {
             {recording ? "Press the keys…" : displayShortcut(status.accelerator, mac)}
           </button>
           {status.accelerator !== DEFAULT && (
-            <button type="button" className="ghost" onClick={() => void save(DEFAULT)}>
+            <button type="button" onClick={() => void save(DEFAULT)}>
               Use {displayShortcut(DEFAULT, mac)}
             </button>
           )}
           {status.accelerator && (
-            <button type="button" className="ghost" onClick={() => void save("")}>
+            <button type="button" onClick={() => void save("")}>
               Turn off
             </button>
           )}
         </span>
-        <small className="muted">
+        <small className="meta">
           Click, then press the shortcut you want, with at least one of Ctrl, Alt or Shift. It works in any app. On Linux
           under Wayland, bind <code>claude-overview --popover</code> to a key in your desktop's keyboard settings instead.
         </small>
       </label>
-      {status.error && <p className="small error">{status.error}</p>}
-      {message && <p className={message.error ? "small error" : "small muted"}>{message.text}</p>}
+      {status.error && <p className="error">{status.error}</p>}
+      {message && <p className={message.error ? "error" : "meta"}>{message.text}</p>}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { CcSummary } from "../types";
+import { formatCount } from "../lib/format";
 import { clockTime, countdown, DAY_MS, formatTokens, formatUsd, share, sumCost } from "../lib/usage";
 import { Meter } from "./Meter";
 
@@ -11,64 +12,62 @@ export function PlanSummary({ cc, now, compact = false }: { cc: CcSummary; now: 
   const month = sumCost(cc.hourly, now - 30 * DAY_MS);
 
   return (
-    <div className={compact ? "plan compact" : "plan"}>
-      <div className="plan-item">
-        <div className="plan-head">
+    <div className={compact ? "items compact" : "items columns"}>
+      <div className="item">
+        <div className="item-head">
           <span>5-hour block</span>
           {block ? (
-            <span className="muted small" title={`Resets at ${clockTime(block.endMs)}`}>
+            <span className="meta" title={`Resets at ${clockTime(block.endMs)}`}>
               resets in {countdown(block.endMs, now)}
             </span>
           ) : (
-            <span className="muted small">no block running</span>
+            <span className="meta">no block running</span>
           )}
         </div>
         {block ? (
           <>
-            <div className="plan-figure">
+            <div className="figure">
               {formatUsd(block.costUsd)}
-              {settings.blockLimitUsd ? (
-                <span className="muted"> of {formatUsd(settings.blockLimitUsd)}</span>
-              ) : null}
+              {settings.blockLimitUsd ? <span className="of"> of {formatUsd(settings.blockLimitUsd)}</span> : null}
             </div>
             {blockShare !== null && <Meter value={blockShare} label="Share of the 5-hour block used" />}
             {!compact && (
-              <div className="muted small plan-detail">
-                {formatTokens(block.tokens)} tokens · {block.messages} responses
+              <div className="meta detail">
+                {formatTokens(block.tokens)} tokens · {formatCount(block.messages)} responses
               </div>
             )}
           </>
         ) : (
           !compact &&
           cc.lastBlock && (
-            <p className="muted small">
+            <p className="meta detail">
               Last block ended {clockTime(cc.lastBlock.endMs)}: {formatUsd(cc.lastBlock.costUsd)}.
             </p>
           )
         )}
       </div>
 
-      <div className="plan-item">
-        <div className="plan-head">
+      <div className="item">
+        <div className="item-head">
           <span>Last 7 days</span>
-          {!compact && <span className="muted small">{cc.week.messages} responses</span>}
+          {!compact && <span className="meta">{formatCount(cc.week.messages)} responses</span>}
         </div>
-        <div className="plan-figure">
+        <div className="figure">
           {formatUsd(cc.week.costUsd)}
-          {settings.weekLimitUsd ? <span className="muted"> of {formatUsd(settings.weekLimitUsd)}</span> : null}
+          {settings.weekLimitUsd ? <span className="of"> of {formatUsd(settings.weekLimitUsd)}</span> : null}
         </div>
         {weekShare !== null && <Meter value={weekShare} label="Share of the weekly allowance used" />}
       </div>
 
       {!compact && (
-        <div className="plan-item">
-          <div className="plan-head">
+        <div className="item">
+          <div className="item-head">
             <span>Last 30 days</span>
-            <span className="muted small">at API prices</span>
+            <span className="meta">at API prices</span>
           </div>
-          <div className="plan-figure">{formatUsd(month)}</div>
+          <div className="figure">{formatUsd(month)}</div>
           {settings.planPriceUsd ? (
-            <div className="muted small plan-detail">
+            <div className="meta detail">
               {(month / settings.planPriceUsd).toFixed(1)}× the {formatUsd(settings.planPriceUsd)} a month you pay
             </div>
           ) : null}

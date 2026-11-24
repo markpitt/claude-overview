@@ -1,18 +1,17 @@
 import type { Component } from "../types";
 import { componentStatusLabel } from "../lib/format";
-import { LevelDot } from "./LevelDot";
+import { LevelChip } from "./Chip";
 
-export function ComponentList({ components }: { components: Component[] }) {
+export function ComponentList({ components, compact = false }: { components: Component[]; compact?: boolean }) {
   return (
-    <ul className="components">
+    <ul className={compact ? "rows components compact" : "rows components"}>
       {components.map((c) => (
         <li key={c.id}>
-          <LevelDot level={c.level} />
           <span className="name">
             {c.name}
-            {c.group && <span className="muted small"> · {c.group}</span>}
+            {!compact && c.group && <span className="meta"> · {c.group}</span>}
           </span>
-          <span className={`state state-${c.level}`}>{componentStatusLabel(c.status)}</span>
+          <LevelChip level={c.level}>{componentStatusLabel(c.status)}</LevelChip>
         </li>
       ))}
     </ul>

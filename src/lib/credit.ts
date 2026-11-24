@@ -1,6 +1,7 @@
 import type { CostRow } from "../types";
 import type { Day } from "./usage";
 import { DAY_MS, modelFamily } from "./usage";
+import { shortDate } from "./format";
 
 /** One entry per UTC day from the period start to today, with spend by model family. */
 export function creditDays(rows: CostRow[], startMs: number, endMs: number, nowMs: number = Date.now()): Day[] {
@@ -34,7 +35,7 @@ export function daysUntil(endMs: number, nowMs: number = Date.now()): number {
   return Math.max(0, Math.ceil((endMs - nowMs) / DAY_MS));
 }
 
-/** "Thu 17 Dec" in the user's locale, read as a UTC date. */
+/** "Thu 17 Dec", read as a UTC date. */
 export function utcDate(ms: number): string {
-  return new Date(ms).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+  return shortDate(ms, "UTC");
 }

@@ -16,6 +16,7 @@ function batch(status: string, processing: number, succeeded: number, errored = 
 describe("waiting helpers", () => {
   it("describes batches", () => {
     expect(batchProgress(batch("in_progress", 60, 40))).toBe("40 of 100 done");
+    expect(batchProgress(batch("in_progress", 640, 1360))).toBe("1,360 of 2,000 done");
     expect(batchProgress(batch("ended", 0, 50, 2))).toBe("50 done, 2 failed");
     expect(batchProgress(batch("ended", 0, 5))).toBe("5 done");
   });

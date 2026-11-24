@@ -33,3 +33,25 @@ describe("duration", () => {
     expect(duration("2026-11-23T09:00:00Z", "2026-11-23T11:00:00Z")).toBe("2 h");
   });
 });
+
+describe("en-GB formats", () => {
+  it("separates thousands", async () => {
+    const { formatCount } = await import("./format");
+    expect(formatCount(1360)).toBe("1,360");
+  });
+  it("writes day and month as 17/12", async () => {
+    const { dayMonth } = await import("./format");
+    expect(dayMonth(new Date(2026, 11, 17).getTime())).toBe("17/12");
+  });
+  it("uses a 24-hour clock", async () => {
+    const { clockTime } = await import("./usage");
+    expect(clockTime(new Date(2026, 11, 8, 14, 0).getTime())).toBe("14:00");
+  });
+});
+
+describe("short dates", () => {
+  it("has no comma after the weekday", async () => {
+    const { shortDate } = await import("./format");
+    expect(shortDate(Date.UTC(2026, 11, 8, 12), "UTC")).toBe("Tue 8 Dec");
+  });
+});

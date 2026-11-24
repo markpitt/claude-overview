@@ -10,11 +10,14 @@ A small tray app for Windows, Linux and macOS that shows, in one place:
 
 Built with [Tauri 2](https://tauri.app) and React + TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 
-![Overview](docs/screenshots/overview.png)
+![Overview, dark](docs/screenshots/overview.png)
+
+![Overview, light](docs/screenshots/overview-light.png)
 
 ## Using it
 
-- **Tray icon**: green, amber or red for the worst current state, grey when status can't be read. Hover for the headline.
+- **Tray icon**: the markpitt.dev disc, with a dot in the corner for the worst current state: green, amber or red, grey when status can't be read. Hover for the word and the headline.
+- **Theme**: Dark, Light or System (the default, which follows the OS) from the control at the top right of the main window. The choice is saved and applies to the pop-over too.
 - **Pop-over**: click the tray icon (Windows, macOS) or choose *Show summary* from its menu.
 - **Main window**: *Open Claude Overview* from the tray menu, or launch the app again.
 - **Keyboard**: Ctrl+Alt+O (⌘⌥O on a Mac) opens and closes the pop-over from any app. Change or turn it off in Settings.
@@ -120,6 +123,8 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 
 `CLAUDE_OVERVIEW_STATUS_BASE` points the status poller at another feed, which is how the degraded screenshots were made from `src-tauri/tests/fixtures/summary-degraded.json` (a synthetic outage).
 
+Each main-window screenshot has a light twin beside it (`overview-light.png` and so on), taken under Xvfb in the same run. `tray-states.png` shows the tray icon for OK, degraded, outage and unknown, from the pixels `tray_icon.rs` draws.
+
 ## Layout
 
 | Path | What |
@@ -136,9 +141,12 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 | `src-tauri/src/hotkey.rs` | Global shortcut for the pop-over |
 | `src-tauri/src/updater.rs` | Daily update check, download and install |
 | `src-tauri/src/keys.rs` | API keys and the GitHub token in the OS keychain |
-| `src-tauri/src/tray_icon.rs` | Status-coloured tray icons drawn at runtime |
+| `src-tauri/src/tray_icon.rs` | Tray icons drawn at runtime: the disc with a status dot |
 | `src-tauri/src/lib.rs` | Windows, tray, poller, commands |
 | `src/` | React UI; `App.tsx` picks the pop-over or main window by window label |
+| `src/styles.css` | The markpitt.dev brand tokens (dark and light) and every style; no colour outside the token block |
+| `src/lib/theme.ts` | Dark, Light or System, saved and shared by both windows |
+| `src/assets/fonts/` | Inter and JetBrains Mono as woff2 (SIL OFL), bundled so nothing is fetched |
 | `docs/` | Plan and screenshots |
 | `.github/workflows/ci.yml` | Typecheck, lint, tests, clippy, and builds for all three OSes |
 | `.github/workflows/release.yml` | Draft release with signed installers and `latest.json`, on a `v*` tag |

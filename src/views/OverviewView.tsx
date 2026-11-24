@@ -6,6 +6,7 @@ import { CreditSummary } from "../components/CreditSummary";
 import { useNow } from "../lib/useNow";
 import { WaitingList } from "../components/WaitingList";
 import { anythingSetUp } from "../lib/waiting";
+import { CardHead, TabLink } from "../components/CardHead";
 
 export function OverviewView({
   onShowStatus,
@@ -31,46 +32,27 @@ export function OverviewView({
       <StatusHeader />
       {active.length > 0 && (
         <section className="card">
-          <h2>Active incidents</h2>
+          <CardHead title="Active incidents">
+            <TabLink onClick={onShowStatus}>All services</TabLink>
+          </CardHead>
           <IncidentList incidents={active} empty="" showUpdate />
-          <button type="button" className="ghost" onClick={onShowStatus}>
-            All services
-          </button>
         </section>
       )}
       <div className="grid">
-        {cc ? (
-          <section className="card">
-            <h2>Max plan</h2>
-            <PlanSummary cc={cc} now={now} compact />
-            <button type="button" className="ghost" onClick={onShowCode}>
-              Claude Code usage
-            </button>
-          </section>
-        ) : (
-          <section className="card">
-            <h2>Max plan</h2>
-            <p className="muted">Reading Claude Code logs…</p>
-          </section>
-        )}
         <section className="card">
-          <h2>API credit</h2>
-          <CreditSummary api={api} now={now} compact onSetUp={onShowSettings} />
-          {api?.summary && (
-            <button type="button" className="ghost" onClick={onShowApi}>
-              API spend
-            </button>
-          )}
+          <CardHead title="Max plan">{cc && <TabLink onClick={onShowCode}>Claude Code usage</TabLink>}</CardHead>
+          {cc ? <PlanSummary cc={cc} now={now} compact /> : <p className="meta">Reading Claude Code logs…</p>}
+        </section>
+        <section className="card">
+          <CardHead title="API credit">{api?.summary && <TabLink onClick={onShowApi}>API spend</TabLink>}</CardHead>
+          <CreditSummary api={api} now={now} compact forecast onSetUp={onShowSettings} />
         </section>
       </div>
       <section className="card">
-        <h2>What's waiting</h2>
+        <CardHead title="What's waiting">
+          {waiting?.checked && anythingSetUp(waiting) && <TabLink onClick={onShowWaiting}>Everything waiting</TabLink>}
+        </CardHead>
         <WaitingList waiting={waiting} now={now} onSetUp={onShowSettings} />
-        {waiting?.checked && anythingSetUp(waiting) && (
-          <button type="button" className="ghost" onClick={onShowWaiting}>
-            Everything waiting
-          </button>
-        )}
       </section>
     </div>
   );
