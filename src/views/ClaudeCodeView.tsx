@@ -71,7 +71,7 @@ export function ClaudeCodeView() {
         <dl className="facts">
           <dt>Folder</dt>
           <dd>
-            <code>{cc.folder ?? "none"}</code>
+            <code>{cc.folder ? tildePath(cc.folder) : "none"}</code>
             {!cc.folderExists && <span className="error"> (not found)</span>}
           </dd>
           <dt>Transcripts</dt>

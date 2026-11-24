@@ -25,7 +25,7 @@
         "label": "popover",
         "title": "Claude Overview",
         "width": 380,
-        "height": 520,
+        "height": 760,
         "visible": false,
         "decorations": false,
         "resizable": false,

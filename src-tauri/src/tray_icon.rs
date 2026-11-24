@@ -39,8 +39,9 @@ pub fn rgba(level: Level) -> Vec<u8> {
     let centre = size / 2.0;
     // 145 of 460 in the brand's SVG.
     let disc_r = size * 145.0 / 460.0;
-    let (dot_cx, dot_cy) = (size - 13.0, size - 13.0);
-    let dot_r = 10.0;
+    // Big enough to tell green from amber at 16 to 22px tray sizes.
+    let (dot_cx, dot_cy) = (size - 17.0, size - 17.0);
+    let dot_r = 14.0;
     let ring = 3.0;
     let fill = dot(level);
     let mut px = Vec::with_capacity((SIZE * SIZE * 4) as usize);
@@ -96,7 +97,7 @@ mod tests {
 
     #[test]
     fn the_corner_dot_carries_the_state() {
-        let (x, y) = (SIZE - 13, SIZE - 13);
+        let (x, y) = (SIZE - 17, SIZE - 17);
         assert_eq!(&at(&rgba(Level::Ok), x, y)[..3], &[0x4a, 0xde, 0x80]);
         assert_eq!(&at(&rgba(Level::Bad), x, y)[..3], &[0xff, 0x8a, 0x8a]);
         assert_ne!(at(&rgba(Level::Warn), x, y), at(&rgba(Level::Unknown), x, y));

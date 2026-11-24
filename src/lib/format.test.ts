@@ -66,6 +66,8 @@ describe("display helpers", () => {
   it("puts Statuspage headlines in sentence case", async () => {
     const { sentenceCase } = await import("./format");
     expect(sentenceCase("All Systems Operational")).toBe("All systems operational");
+    expect(sentenceCase("Partial System Outage")).toBe("Partial system outage");
+    expect(sentenceCase("Major System Outage")).toBe("Major system outage");
     expect(sentenceCase("Elevated errors on API")).toBe("Elevated errors on API");
   });
 });
