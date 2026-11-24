@@ -1,14 +1,18 @@
 # Claude Overview
 
-A small tray app for Windows, Linux and macOS that shows, in one place:
+Claude Overview is a tray app for Windows, Linux and macOS that puts Claude's service status, Max plan usage, API credit and the work waiting for you in one place.
 
-- **Service status** from status.claude.com *(milestone 1)*
-- **Max plan usage** from local Claude Code logs, with the 5-hour block countdown *(milestone 2)*
-- **API credit** spend against the monthly allowance, with a forecast *(milestone 3)*
-- **What's waiting**: Claude Code sessions, batches in progress and PRs to review *(milestone 4)*
-- **Alerts**, a **global shortcut** for the pop-over, and **signed updates** from GitHub releases *(milestone 5, this PR)*
+I built it because I use Claude Code and the Claude API every day, and checking all of this meant three websites and a terminal. It shows:
 
-Built with [Tauri 2](https://tauri.app) and React + TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
+- **Service status** from status.claude.com
+- **Max plan usage** from local Claude Code logs, with the 5-hour block countdown
+- **API credit** spend against the monthly allowance, with a forecast
+- **What's waiting**: Claude Code sessions, batches in progress and pull requests to review
+- **Alerts**, a **global shortcut** for the pop-over, and **signed updates** from GitHub releases
+
+Early days: no release has been tagged yet. The Max plan figures are estimates against limits you set yourself, because Anthropic doesn't publish them.
+
+Built with [Tauri 2](https://tauri.app), React and TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 
 ![Overview](docs/screenshots/overview.png)
 

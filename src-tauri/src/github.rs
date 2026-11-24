@@ -88,7 +88,7 @@ async fn search(client: &reqwest::Client, token: &str, q: &str, reason: &str) ->
         .header("X-GitHub-Api-Version", "2022-11-28")
         .send()
         .await
-        .map_err(|e| format!("Could not reach GitHub: {}.", e.without_url()))?;
+        .map_err(|e| format!("Couldn't reach GitHub: {}.", e.without_url()))?;
     let status = resp.status();
     let body = resp.text().await.map_err(|e| format!("Reading GitHub's response: {}.", e.without_url()))?;
     if !status.is_success() {
