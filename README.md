@@ -162,3 +162,7 @@ Each main-window screenshot has a light twin beside it (`overview-light.png` and
 | `scripts/version.mjs` | Sets or checks the version in package.json, tauri.conf.json and Cargo.toml |
 
 See [docs/plan.md](docs/plan.md) for the full plan and decisions.
+
+## Licence
+
+MIT, see [LICENSE](LICENSE). The bundled Inter and JetBrains Mono fonts are under the SIL Open Font License.

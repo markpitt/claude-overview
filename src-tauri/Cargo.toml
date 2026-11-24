@@ -3,6 +3,7 @@ name = "claude-overview"
 version = "0.1.0"
 description = "Tray app showing Claude usage, plan, waiting work and service status"
 authors = ["Mark Pitt"]
+license = "MIT"
 edition = "2024"
 
 [lib]
