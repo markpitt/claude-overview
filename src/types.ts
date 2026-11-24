@@ -182,3 +182,28 @@ export interface WaitingSnapshot {
   batches: Source<Batch>;
   prs: Source<Pr>;
 }
+
+export interface AlertSettings {
+  incidents: boolean;
+  plan: boolean;
+  credit: boolean;
+  prs: boolean;
+  thresholdPct: number;
+}
+
+export interface HotkeyStatus {
+  /** The saved shortcut, or "" when turned off. */
+  accelerator: string;
+  error: string | null;
+}
+
+export interface UpdateSnapshot {
+  current: string;
+  available: string | null;
+  notes: string | null;
+  checkedAtMs: number;
+  checking: boolean;
+  /** Bytes downloaded and the total, while installing. */
+  progress: [number, number | null] | null;
+  error: string | null;
+}

@@ -24,6 +24,7 @@ export function MainWindow() {
   const [tab, setTab] = useState<Tab>("overview");
   const level = useApp((s) => s.status?.level ?? "unknown");
   const waitingTotal = useApp((s) => waitingCounts(s.waiting).total);
+  const updateReady = useApp((s) => Boolean(s.update?.available));
 
   return (
     <div className="main-layout">
@@ -40,6 +41,7 @@ export function MainWindow() {
             {t.label}
             {t.id === "status" && <LevelDot level={level} size={8} />}
             {t.id === "waiting" && waitingTotal > 0 && <span className="count">{waitingTotal}</span>}
+            {t.id === "settings" && updateReady && <span className="count update">Update</span>}
           </button>
         ))}
       </nav>

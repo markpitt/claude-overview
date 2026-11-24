@@ -200,6 +200,9 @@ pub fn spawn(app: AppHandle) {
                 last.clone()
             };
             let _ = app.emit("api-credit-updated", &snap);
+            if let Some(c) = &snap.summary {
+                crate::alerts::on_credit(&app, c);
+            }
 
             let wait = if failures == 0 {
                 FETCH_EVERY

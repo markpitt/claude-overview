@@ -222,6 +222,12 @@ pub fn spawn(app: AppHandle) {
                 last.clone()
             };
             let _ = app.emit("waiting-updated", &snap);
+            if network
+                && snap.prs.error.is_none()
+                && let Some(items) = &snap.prs.items
+            {
+                crate::alerts::on_prs(&app, items);
+            }
 
             tokio::select! {
                 _ = tokio::time::sleep(SESSIONS_EVERY) => {}
