@@ -1,4 +1,9 @@
-# Claude Overview
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
+    <img src="docs/assets/banner-light.svg" alt="Claude Overview" width="100%">
+  </picture>
+</h1>
 
 Claude Overview is a tray app for Windows, Linux and macOS that puts Claude's service status, Max plan usage, API credit and the work waiting for you in one place.
 
