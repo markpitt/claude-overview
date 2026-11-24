@@ -53,7 +53,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJEQ0E0QUQ2NkEyQzlGRDAKUldUUW55eHExa3JLdlNLOXpNMkhrYmpXM0VBczdlc3BVVlFZQUVXRUtlck5XdXhQemU4KzZyWmwK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBRDlENTZBODRCMkJFMkIKUldRcnZyS0VhdFhadW8wOXh5RENROU5IejQyZ05ZOG5nNjBOdFJPY2lhV0pHTjJuYmFMMGJrLzMK",
       "endpoints": [
         "https://github.com/markpitt/claude-overview/releases/latest/download/latest.json"
       ],

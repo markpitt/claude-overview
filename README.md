@@ -92,7 +92,7 @@ Once a day the app checks GitHub releases for a newer version. When there is one
 3. The *Release* workflow checks the tag matches the version, builds Linux (.deb, AppImage), Windows (NSIS installer) and macOS (universal .app, .dmg), signs the update files and attaches everything, with `latest.json`, to a **draft** release.
 4. Review the draft on GitHub and publish it. Installed apps pick it up within a day.
 
-The signing key is made once with `npx tauri signer generate -w ~/.tauri/claude-overview.key` and lives in the repository secrets `TAURI_SIGNING_PRIVATE_KEY` (the key file's contents) and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Its public half is `plugins.updater.pubkey` in `src-tauri/tauri.conf.json`. Losing the private key means installed copies can't update; they would need a manual reinstall with a new key. Builds are unsigned at the OS level, so Windows SmartScreen and macOS Gatekeeper warn on first install.
+The signing key is made once with `npx @tauri-apps/cli signer generate -w ~/.tauri/claude-overview.key` (the full package name, so it works outside the checkout) and lives in the repository secrets `TAURI_SIGNING_PRIVATE_KEY` (the key file's contents) and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Its public half is `plugins.updater.pubkey` in `src-tauri/tauri.conf.json`. Losing the private key means installed copies can't update; they would need a manual reinstall with a new key. Builds are unsigned at the OS level, so Windows SmartScreen and macOS Gatekeeper warn on first install.
 
 ## Developing
 
