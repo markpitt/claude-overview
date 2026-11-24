@@ -5,6 +5,7 @@ import { Meter } from "./Meter";
 
 /** The current 5-hour block, the last 7 days and the last 30 days, against your own limits. */
 export function PlanSummary({ cc, now, compact = false }: { cc: CcSummary; now: number; compact?: boolean }) {
+  // The Claude Code page gives the reset as a clock time; the cards count down.
   const { settings } = cc;
   const block = cc.currentBlock;
   const blockShare = block ? share(block.costUsd, settings.blockLimitUsd) : null;
@@ -17,9 +18,15 @@ export function PlanSummary({ cc, now, compact = false }: { cc: CcSummary; now: 
         <div className="item-head">
           <span>5-hour block</span>
           {block ? (
-            <span className="meta" title={`Resets at ${clockTime(block.endMs)}`}>
-              resets in {countdown(block.endMs, now)}
-            </span>
+            compact ? (
+              <span className="meta" title={`Resets at ${clockTime(block.endMs)}`}>
+                resets in {countdown(block.endMs, now)}
+              </span>
+            ) : (
+              <span className="meta" title={`In ${countdown(block.endMs, now)}`}>
+                resets at {clockTime(block.endMs)}
+              </span>
+            )
           ) : (
             <span className="meta">no block running</span>
           )}
@@ -50,13 +57,14 @@ export function PlanSummary({ cc, now, compact = false }: { cc: CcSummary; now: 
       <div className="item">
         <div className="item-head">
           <span>Last 7 days</span>
-          {!compact && <span className="meta">{formatCount(cc.week.messages)} responses</span>}
+          <span className="meta optional">{formatCount(cc.week.messages)} responses</span>
         </div>
         <div className="figure">
           {formatUsd(cc.week.costUsd)}
           {settings.weekLimitUsd ? <span className="of"> of {formatUsd(settings.weekLimitUsd)}</span> : null}
         </div>
         {weekShare !== null && <Meter value={weekShare} label="Share of the weekly allowance used" />}
+        {!compact && weekShare !== null && <div className="meta detail">Your own estimate, set in Settings</div>}
       </div>
 
       {!compact && (
@@ -68,7 +76,7 @@ export function PlanSummary({ cc, now, compact = false }: { cc: CcSummary; now: 
           <div className="figure">{formatUsd(month)}</div>
           {settings.planPriceUsd ? (
             <div className="meta detail">
-              {(month / settings.planPriceUsd).toFixed(1)}× the {formatUsd(settings.planPriceUsd)} a month you pay
+              {(month / settings.planPriceUsd).toFixed(1)} times the {formatUsd(settings.planPriceUsd)} a month you pay
             </div>
           ) : null}
         </div>

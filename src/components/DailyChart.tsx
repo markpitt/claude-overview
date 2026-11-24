@@ -4,7 +4,7 @@ import { formatUsd } from "../lib/usage";
 import { dayMonth, shortDate } from "../lib/format";
 
 const W = 600;
-const H = 150;
+const H = 104;
 const PAD_BOTTOM = 2;
 /** Bottom to top: a tonal ramp from ink down, never a hue per series. */
 const ORDER = ["opus", "sonnet", "fable", "haiku", "mythos", "other"] as const;

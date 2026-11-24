@@ -1,7 +1,7 @@
 import { useApp } from "../store";
 import { useNow } from "../lib/useNow";
 import { byLocalDay, byProject, DAY_MS, formatTokens, formatUsd } from "../lib/usage";
-import { formatCount, relativeTime } from "../lib/format";
+import { formatCount, relativeTime, tildePath } from "../lib/format";
 import { PlanSummary } from "../components/PlanSummary";
 import { DailyChart, peakUsd } from "../components/DailyChart";
 import { CardHead, TabLink } from "../components/CardHead";
@@ -24,18 +24,13 @@ export function ClaudeCodeView() {
   return (
     <div className="stack">
       <p className="page-meta">
-        From the transcripts in <code>{cc.folder ?? "none"}</code>
+        From the transcripts in <code>{cc.folder ? tildePath(cc.folder) : "none"}</code>
         {!cc.folderExists && <span className="error"> (not found)</span>} · {formatCount(cc.files)} files read ·{" "}
         {scanning ? <span>Scanning…</span> : <TabLink onClick={() => void rescan()}>Rescan</TabLink>}
       </p>
 
-      <section className="card">
-        <CardHead title="Max plan" />
+      <section className="card" aria-label="Max plan">
         <PlanSummary cc={cc} now={now} />
-        <p className="meta note">
-          Costs are what this usage would cost at API prices. Anthropic does not publish Max plan limits, so the
-          block window and allowances are estimates; set your own in Settings. claude.ai chats are not included.
-        </p>
       </section>
 
       <section className="card">
@@ -96,6 +91,10 @@ export function ClaudeCodeView() {
           )}
         </dl>
         {cc.error && <p className="error">{cc.error}</p>}
+        <p className="meta note">
+          Costs are what this usage would cost at API prices. Anthropic does not publish Max plan limits, so the
+          block window and allowances are estimates; set your own in Settings. claude.ai chats are not included.
+        </p>
       </section>
     </div>
   );

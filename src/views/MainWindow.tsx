@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { useApp } from "../store";
 import { Lockup } from "../components/Brand";
-import { Chip, LevelChip } from "../components/Chip";
+import { Chip, levelSymbol, levelTone } from "../components/Chip";
 import { Link } from "../components/Link";
 import { ThemeSwitch } from "../components/ThemeSwitch";
 import { OverviewView } from "./OverviewView";
@@ -43,10 +43,13 @@ function ShortcutKeys({ tab }: { tab: Tab }) {
   if (!accel) return <p className="meta">Off</p>;
   const keys = mac ? [...shown] : shown.split("+");
   return (
-    <p className="keys" aria-label={shown}>
-      {keys.map((k, i) => (
-        <code key={i}>{k}</code>
-      ))}
+    <p className="keys meta">
+      <span className="caps" aria-label={shown}>
+        {keys.map((k, i) => (
+          <code key={i}>{k}</code>
+        ))}
+      </span>{" "}
+      opens the pop-over
     </p>
   );
 }
@@ -74,7 +77,12 @@ export function MainWindow() {
               onClick={() => setTab(t.id)}
             >
               {t.label}
-              {t.id === "status" && <LevelChip level={level}>{SHORT_LEVEL[level]}</LevelChip>}
+              {t.id === "status" && (
+                <span className={`tab-status chip-${levelTone(level)}`}>
+                  <span aria-hidden="true">{levelSymbol(level)} </span>
+                  {SHORT_LEVEL[level]}
+                </span>
+              )}
               {t.id === "waiting" && waitingTotal > 0 && <Chip>{formatCount(waitingTotal)}</Chip>}
               {t.id === "settings" && updateReady && <Chip tone="success">Update</Chip>}
             </button>

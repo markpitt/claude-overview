@@ -79,9 +79,19 @@ export function shortDate(ms: number, timeZone?: string): string {
   return `${part("weekday")} ${part("day")} ${part("month")}`;
 }
 
-/** "17/12" for a local day. */
-export function dayMonth(ms: number): string {
-  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "2-digit" });
+/** "17/12" for a day, local unless a time zone is given. */
+export function dayMonth(ms: number, timeZone?: string): string {
+  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "2-digit", timeZone });
+}
+
+/** A home folder shortened to "~": "/home/mark/.claude/projects" reads "~/.claude/projects". */
+export function tildePath(path: string): string {
+  return path.replace(/^(\/home\/[^/]+|\/Users\/[^/]+|[A-Za-z]:\\Users\\[^\\]+)(?=[/\\]|$)/, "~");
+}
+
+/** Statuspage's Title Case headlines in sentence case: "All Systems Operational" reads "All systems operational". */
+export function sentenceCase(text: string): string {
+  return /^[A-Z][a-z]+( [A-Z][a-z]+)+$/.test(text) ? text.charAt(0) + text.slice(1).toLowerCase() : text;
 }
 
 /** "1,360": a count with thousands separators. */

@@ -1,5 +1,6 @@
 import type { ApiSnapshot } from "../types";
 import { daysUntil, utcDate } from "../lib/credit";
+import { dayMonth } from "../lib/format";
 import { clockTime, formatUsd, share } from "../lib/usage";
 import { Chip } from "./Chip";
 import { Meter } from "./Meter";
@@ -56,6 +57,7 @@ export function CreditSummary({
           <span>This month</span>
           <span className="meta">
             resets in {reset} day{reset === 1 ? "" : "s"}
+            <span className="optional">, on {dayMonth(s.periodEndMs, "UTC")}</span>
           </span>
         </div>
         <div className="figure">
@@ -63,7 +65,7 @@ export function CreditSummary({
           <span className="of"> of {formatUsd(s.allowanceUsd)}</span>
         </div>
         <Meter value={used} label="Share of the API credit used" />
-        <div className="meta detail">
+        <div className="meta detail optional">
           {leftText}
           {compact && s.refreshedMs ? ` · data refreshed ${clockTime(s.refreshedMs)}` : ""}
         </div>
@@ -84,8 +86,8 @@ export function CreditSummary({
       {showForecast && (
         <div className="item">
           <div className="item-head">
-            <span>Forecast</span>
-            <span className="meta">at {utcDate(s.periodEndMs)}</span>
+            <span>Forecast at {dayMonth(s.periodEndMs, "UTC")}</span>
+            {compact && <span className="meta">{formatUsd(s.burnPerDayUsd)} a day</span>}
           </div>
           <div className="figure">{formatUsd(s.forecastUsd)}</div>
           <div className="detail">{runsOut ?? <span className="meta">Within the credit at this rate</span>}</div>

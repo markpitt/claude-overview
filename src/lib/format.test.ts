@@ -55,3 +55,17 @@ describe("short dates", () => {
     expect(shortDate(Date.UTC(2026, 11, 8, 12), "UTC")).toBe("Tue 8 Dec");
   });
 });
+
+describe("display helpers", () => {
+  it("shortens a home folder to ~", async () => {
+    const { tildePath } = await import("./format");
+    expect(tildePath("/home/mark/.claude/projects")).toBe("~/.claude/projects");
+    expect(tildePath("C:\\Users\\Mark\\.claude\\projects")).toBe("~\\.claude\\projects");
+    expect(tildePath("/srv/claude/projects")).toBe("/srv/claude/projects");
+  });
+  it("puts Statuspage headlines in sentence case", async () => {
+    const { sentenceCase } = await import("./format");
+    expect(sentenceCase("All Systems Operational")).toBe("All systems operational");
+    expect(sentenceCase("Elevated errors on API")).toBe("Elevated errors on API");
+  });
+});

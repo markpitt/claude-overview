@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApp } from "../store";
-import { levelLabel, relativeTime } from "../lib/format";
+import { levelLabel, relativeTime, sentenceCase } from "../lib/format";
 import { LevelChip } from "./Chip";
 
 /** The status banner: overall state, last check, refresh button. The pop-over puts the sentence in the chip. */
@@ -16,7 +16,7 @@ export function StatusHeader({ compact = false }: { compact?: boolean }) {
   }, []);
 
   const level = status?.level ?? "unknown";
-  const sentence = status?.description ?? "Checking status…";
+  const sentence = status?.description ? sentenceCase(status.description) : "Checking status…";
   const checked = status?.error
     ? status.fetchedAtMs
       ? `Couldn't refresh, showing data from ${relativeTime(status.fetchedAtMs, now)}`
@@ -34,7 +34,9 @@ export function StatusHeader({ compact = false }: { compact?: boolean }) {
         <>
           <LevelChip level={level}>{levelLabel(level)}</LevelChip>
           <div className="status-text">
-            <strong>{sentence}</strong>
+            <span>
+              <strong>{sentence}</strong> <span className="meta source">status.claude.com</span>
+            </span>
             <span className="meta">{checked}</span>
           </div>
         </>
