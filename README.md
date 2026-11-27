@@ -15,7 +15,7 @@ I built it because I use Claude Code and the Claude API every day, and checking 
 - **What's waiting**: Claude Code sessions, batches in progress and pull requests to review
 - **Alerts**, a **global shortcut** for the pop-over, and **signed updates** from GitHub releases
 
-Early days: 0.1.0 is the first release. The Max plan figures are estimates against limits you set yourself, because Anthropic doesn't publish them.
+Early days: 0.1.1 is the current release. The Max plan figures are estimates against limits you set yourself, because Anthropic doesn't publish them.
 
 Built with [Tauri 2](https://tauri.app), React and TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 
@@ -134,6 +134,20 @@ The Claude Code screenshots use synthetic transcripts (`CLAUDE_CONFIG_DIR` point
 
 Each main-window screenshot has a light twin beside it (`overview-light.png` and so on), taken under Xvfb in the same run. `tray-states.png` shows the tray icon for OK, degraded, outage and unknown, from the pixels `tray_icon.rs` draws.
 
+## The website
+
+The project's site, at [markpitt.dev/claude-overview](https://markpitt.dev/claude-overview/), is an Astro project in `site/`: a home page and the usage docs, in the markpitt.dev brand. It builds on its own:
+
+```bash
+cd site
+npm ci
+npm run dev                 # serve with hot reload
+SITE_BASE=/ npm run build   # the base path is config; the default is /claude-overview/
+npm test                    # Playwright smoke tests, both themes, desktop and phone
+```
+
+`site/src/chrome/` holds the shared markpitt.dev header, sub-bar, footer, tokens and fonts. `.github/workflows/pages.yml` builds and tests the site on pull requests and deploys it to GitHub Pages from `main`.
+
 ## Layout
 
 | Path | What |
@@ -157,6 +171,7 @@ Each main-window screenshot has a light twin beside it (`overview-light.png` and
 | `src/lib/theme.ts` | Dark, Light or System, saved and shared by both windows |
 | `src/assets/fonts/` | Inter and JetBrains Mono as woff2 (SIL OFL), bundled so nothing is fetched |
 | `docs/` | Plan and screenshots |
+| `site/` | The project's website, an Astro site on GitHub Pages |
 | `.github/workflows/ci.yml` | Typecheck, lint, tests, clippy, and builds for all three OSes |
 | `.github/workflows/release.yml` | Draft release with signed installers and `latest.json`, on a `v*` tag |
 | `scripts/version.mjs` | Sets or checks the version in package.json, tauri.conf.json and Cargo.toml |

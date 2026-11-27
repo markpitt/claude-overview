@@ -1,0 +1,58 @@
+---
+// Every page: the markpitt.dev chrome (header, Claude Overview's sub-bar, footer) round the page.
+import ThemeScript from '@chrome/ThemeScript.astro';
+import Header from '@chrome/Header.astro';
+import SubBar from '@chrome/SubBar.astro';
+import Footer from '@chrome/Footer.astro';
+import '@chrome/fonts.css';
+import '@chrome/tokens.css';
+import '@chrome/chrome.css';
+import '../styles/site.css';
+import { path, REPO, REPO_URL, type Page } from '../lib/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  page: Page;
+}
+
+const { title, description, page } = Astro.props;
+const fullTitle = page === '' ? 'Claude Overview' : `${title} · Claude Overview`;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const current = (p: Page) => p === page;
+const docsPages: Page[] = ['using-it/', 'settings/', 'updates/'];
+---
+
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <ThemeScript />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={path('favicon.svg')} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body class="co-site">
+    <a class="mpc-skip" href="#main">Skip to content</a>
+    <Header current="projects" />
+    <SubBar
+      name="Claude Overview"
+      href={path()}
+      links={[
+        { href: path('install/'), label: 'Install', current: current('install/') },
+        { href: path('using-it/'), label: 'Docs', current: docsPages.includes(page) },
+        { href: path('privacy/'), label: 'Privacy', current: current('privacy/') },
+        { href: REPO_URL, label: 'GitHub' },
+      ]}
+    />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer licence="MIT" repo={REPO} />
+  </body>
+</html>

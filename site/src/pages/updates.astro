@@ -1,0 +1,49 @@
+---
+import Doc from '../layouts/Doc.astro';
+import Shot from '../components/Shot.astro';
+import { RELEASES_URL } from '../lib/site';
+import updates from '../../../docs/screenshots/settings-updates.png';
+import updatesLight from '../../../docs/screenshots/settings-updates-light.png';
+---
+
+<Doc
+  title="Updates and releases"
+  page="updates/"
+  description="How Claude Overview updates itself, how updates are signed, and what each release changed."
+  lede="Once a day the app checks GitHub releases for a newer version, and installs it when you say so."
+>
+  <h2>How updates work</h2>
+  <p>
+    When there is a newer version it shows in Settings, the tab gets an <em>Update</em> badge, and <em>Install and
+    restart</em> installs it. Nothing installs without that press.
+  </p>
+  <p>
+    Packages are signed, and the app refuses one whose signature doesn't match the public key built into it. On Linux
+    the update installs the same kind of package you have (<code>.deb</code> or AppImage); the <code>.deb</code> needs
+    your password for <code>dpkg</code>.
+  </p>
+  <Shot dark={updates} light={updatesLight} alt="The Updates card in Settings, with a newer version and an Install and restart button." />
+
+  <h2>Releases</h2>
+  <p>Every release, with its installers and notes, is on <a href={RELEASES_URL}>GitHub releases</a>.</p>
+
+  <h3>0.1.1</h3>
+  <p>
+    This website, and light-theme screenshots for Alerts and Updates. The app itself is unchanged from 0.1.0, so the
+    update only changes the version number.
+  </p>
+
+  <h3>0.1.0</h3>
+  <p>
+    The first release: service status, Max plan usage from local Claude Code transcripts, API credit, what's waiting
+    (Claude Code sessions, Message Batches and pull requests), desktop alerts, the pop-over on a global shortcut, start
+    at login, dark, light or system theme, and signed updates.
+  </p>
+  <p>Known limits in 0.1.0:</p>
+  <ul>
+    <li>The Max plan figures are estimates, and claude.ai chats aren't in the local logs at all.</li>
+    <li>Anthropic's cost data lags 4 to 24 hours.</li>
+    <li>I use it daily on Windows and Linux. The macOS build is produced by CI and hasn't been tested on hardware yet.</li>
+    <li>On Linux, tray icons send no clicks, global shortcuts need X11, and GNOME needs the AppIndicator extension.</li>
+  </ul>
+</Doc>
