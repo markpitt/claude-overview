@@ -15,7 +15,7 @@ I built it because I use Claude Code and the Claude API every day, and checking 
 - **What's waiting**: Claude Code sessions, batches in progress and pull requests to review
 - **Alerts**, a **global shortcut** for the pop-over, and **signed updates** from GitHub releases
 
-Early days: 0.1.1 is the current release. The Max plan figures are estimates against limits you set yourself, because Anthropic doesn't publish them.
+Early days: 0.1.2 is the current release. The Max plan figures are estimates against limits you set yourself, because Anthropic doesn't publish them.
 
 Built with [Tauri 2](https://tauri.app), React and TypeScript. Rust owns every network call and key; the webviews only draw what Rust sends.
 

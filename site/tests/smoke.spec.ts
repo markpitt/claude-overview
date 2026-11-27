@@ -107,3 +107,23 @@ test('the screenshot shown matches the theme', async ({ page }) => {
   await expect(page.locator('.co-shot-light').first()).toBeVisible();
   await expect(page.locator('.co-shot-dark').first()).toBeHidden();
 });
+
+test('every home page section lines up with the hero and keeps the eyebrow heading', async ({ page }) => {
+  await visit(page, '');
+  const heroLeft = await page.locator('#hero-title').evaluate((e) => e.getBoundingClientRect().left);
+  const eyebrow = await page.locator('.co-hero .co-eyebrow').evaluate((e) => {
+    const s = getComputedStyle(e);
+    return { size: s.fontSize, family: s.fontFamily, transform: s.textTransform };
+  });
+  const headings = page.locator('main .co-section h2');
+  expect(await headings.count()).toBeGreaterThanOrEqual(2);
+  for (const h of await headings.all()) {
+    const got = await h.evaluate((e) => {
+      const s = getComputedStyle(e);
+      return { left: e.getBoundingClientRect().left, size: s.fontSize, family: s.fontFamily, transform: s.textTransform };
+    });
+    const name = await h.textContent();
+    expect(got.left, `${name} left edge`).toBeCloseTo(heroLeft, 0);
+    expect({ size: got.size, family: got.family, transform: got.transform }, `${name} style`).toEqual(eyebrow);
+  }
+});
