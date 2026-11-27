@@ -1,0 +1,117 @@
+---
+import Doc from '../layouts/Doc.astro';
+import Shot from '../components/Shot.astro';
+import { path } from '../lib/site';
+import popover from '../../../docs/screenshots/popover.png';
+import popoverLight from '../../../docs/screenshots/popover-light.png';
+import status from '../../../docs/screenshots/status.png';
+import statusLight from '../../../docs/screenshots/status-light.png';
+import claudeCode from '../../../docs/screenshots/claude-code.png';
+import claudeCodeLight from '../../../docs/screenshots/claude-code-light.png';
+import api from '../../../docs/screenshots/api.png';
+import apiLight from '../../../docs/screenshots/api-light.png';
+import waiting from '../../../docs/screenshots/waiting.png';
+import waitingLight from '../../../docs/screenshots/waiting-light.png';
+import tray from '../../../docs/screenshots/tray-states.png';
+---
+
+<Doc
+  title="Using it"
+  page="using-it/"
+  description="The tray icon, the pop-over, the main window and what each tab of Claude Overview shows."
+  lede="The app lives in the tray. The pop-over gives the summary; the main window has a tab for each source."
+>
+  <h2>The tray and the pop-over</h2>
+  <ul>
+    <li>
+      <strong>Tray icon</strong>: the markpitt.dev disc, with a dot in the corner for the worst current state: green,
+      amber or red, and grey when status can't be read. Hover for the word and the headline.
+    </li>
+    <li><strong>Pop-over</strong>: click the tray icon (Windows, macOS), or choose <em>Show summary</em> from its menu.</li>
+    <li><strong>Main window</strong>: <em>Open Claude Overview</em> from the tray menu, or launch the app again.</li>
+    <li>
+      <strong>Keyboard</strong>: <kbd>Ctrl+Alt+O</kbd> (<kbd>⌘⌥O</kbd> on a Mac) opens and closes the pop-over from any
+      app. Change it or turn it off in Settings.
+    </li>
+    <li>
+      <strong>Theme</strong>: Dark, Light or System (the default, which follows the OS), from the control at the top
+      right of the main window. The pop-over follows it.
+    </li>
+  </ul>
+  <p>Closing the main window hides it. <em>Quit</em> is in the tray menu.</p>
+  <figure class="co-shot">
+    <img class="co-shot-img" src={tray.src} width={tray.width} height={tray.height} alt="The tray icon in four states: OK, degraded, outage and unknown." loading="lazy" decoding="async" />
+    <figcaption>The tray icon for OK, degraded, outage and unknown.</figcaption>
+  </figure>
+  <Shot dark={popover} light={popoverLight} alt="The pop-over: status, the current block, credit and what's waiting, in a small window by the tray." />
+
+  <h2>Service status</h2>
+  <p>
+    Claude's service status from status.claude.com, polled every 2 minutes: active incidents with their latest
+    update, each component, scheduled maintenance and recent incidents.
+  </p>
+  <Shot dark={status} light={statusLight} alt="The Status tab, every component operational." />
+
+  <h2>Max plan usage</h2>
+  <p>
+    Claude Code writes a transcript for every session under <code>~/.claude/projects</code> (or
+    <code>$CLAUDE_CONFIG_DIR/projects</code>). The app reads each new line as it is written, keeps the usage in a
+    small database in its data folder for 90 days, and shows:
+  </p>
+  <ul>
+    <li>the current <strong>5-hour block</strong>, what it has cost at API prices and when it resets;</li>
+    <li>the <strong>last 7 days</strong> and <strong>last 30 days</strong> at API prices, the 30 days as a multiple of what you pay for the plan;</li>
+    <li>a <strong>30-day chart</strong> by model family and a <strong>table of projects</strong>;</li>
+    <li>a <strong>log reader</strong> panel with the folder, file and line counts and a <em>Rescan</em> button.</li>
+  </ul>
+  <p>
+    Anthropic doesn't publish Max plan limits, so the block follows the convention community tools use (it starts at
+    the hour of your first message and lasts 5 hours) and the allowances are your own estimates, set in
+    <a href={path('settings/')}>Settings</a>. claude.ai chats are not in these logs, so they are not counted. A model
+    missing from the app's price list is counted in tokens and listed under <em>No price for</em>.
+  </p>
+  <Shot dark={claudeCode} light={claudeCodeLight} alt="The Claude Code tab: the current block, 7 and 30 days, a chart by model and a table of projects." />
+
+  <h2>API credit</h2>
+  <p>With an Admin API key added in Settings, every 30 minutes the app reads this credit period's spend and shows:</p>
+  <ul>
+    <li>spend against the monthly credit ($100 by default) and when it resets (the 17th by default, UTC);</li>
+    <li>the average burn per day this period, and the forecast at the reset date with the date the credit runs out at that rate;</li>
+    <li>spend per day and per model.</li>
+  </ul>
+  <p>
+    Anthropic's cost data lags 4 to 24 hours, so the figures run to the <em>data refreshed</em> time the API reports,
+    which the panel shows. Amounts are before credits are applied; the Console shows the exact balance. The last good
+    figures are kept locally, so the panel isn't empty while you are offline.
+  </p>
+  <Shot dark={api} light={apiLight} alt="The API tab: spend against the monthly credit, a forecast and spend per day." />
+
+  <h2>What's waiting</h2>
+  <p>The Waiting tab, the Overview card and the pop-over list what needs you, from three sources. Each is optional.</p>
+  <ul>
+    <li>
+      <strong>Claude Code sessions</strong>, through hooks the app adds for you (see <a href={path('settings/#hooks')}>Settings</a>).
+      When Claude Code asks for permission, goes idle or finishes a turn, the session shows as waiting until you carry
+      on in it or it ends.
+    </li>
+    <li><strong>Message Batches</strong> in progress or ended in the last day, with an ordinary API key, every 5 minutes.</li>
+    <li>
+      <strong>Pull requests</strong> waiting for your review, and your own open pull requests that Claude Code opened, with
+      a GitHub token, every 5 minutes.
+    </li>
+  </ul>
+  <Shot dark={waiting} light={waitingLight} alt="The Waiting tab: two Claude Code sessions, a batch in progress and pull requests to review." />
+
+  <h2>Alerts</h2>
+  <p>Desktop notifications, each of which can be turned off in Settings:</p>
+  <ul>
+    <li>a Claude incident starts, and when it is resolved;</li>
+    <li>the 5-hour block or the last 7 days pass 80% of your allowance estimate (the threshold is adjustable);</li>
+    <li>API spend passes 80% of the monthly credit;</li>
+    <li>a pull request needs your review, or Claude opens one.</li>
+  </ul>
+  <p>
+    Each threshold alerts once, then re-arms when use drops below it again: a new block, week or credit period. A
+    restart doesn't repeat an alert. The first list of pull requests after you add a token is taken in silently.
+  </p>
+</Doc>

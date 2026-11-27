@@ -1,0 +1,83 @@
+---
+import Doc from '../layouts/Doc.astro';
+import Shot from '../components/Shot.astro';
+import { path } from '../lib/site';
+import settings from '../../../docs/screenshots/settings.png';
+import settingsLight from '../../../docs/screenshots/settings-light.png';
+import alerts from '../../../docs/screenshots/settings-alerts.png';
+import alertsLight from '../../../docs/screenshots/settings-alerts-light.png';
+---
+
+<Doc
+  title="Settings"
+  page="settings/"
+  description="The keys, estimates and switches in Claude Overview's Settings tab, and what each one is for."
+  lede="Everything in Settings is optional. Without a key or a token, the panel that needs it says so and the rest of the app carries on."
+>
+  <Shot dark={settings} light={settingsLight} alt="The Settings tab: General, Max plan and Claude Code, API credit and What's waiting." />
+
+  <h2>General</h2>
+  <p>
+    <em>Start at login, in the tray</em> adds a login entry that starts the app hidden, so nothing opens until you ask.
+  </p>
+
+  <h2>Max plan and Claude Code</h2>
+  <ul>
+    <li><strong>Claude Code folder</strong>: where the transcripts are. Leave it empty for <code>~/.claude/projects</code>, or <code>$CLAUDE_CONFIG_DIR/projects</code> when that is set.</li>
+    <li><strong>5-hour block allowance</strong> and <strong>weekly allowance</strong>, in dollars at API prices. Anthropic doesn't publish the Max plan limits, so these are your estimates. A good starting point: note what the block cost the last time you hit a limit.</li>
+    <li><strong>Plan price per month</strong>, so the last 30 days can be shown as a multiple of what you pay.</li>
+  </ul>
+
+  <h2>API credit</h2>
+  <ul>
+    <li>
+      <strong>Admin API key</strong> (<code>sk-ant-admin…</code>), from
+      <a href="https://platform.claude.com/settings/admin-keys">Console settings, Admin keys</a>. It reads your spend
+      from the Usage and Cost Analytics API.
+    </li>
+    <li><strong>Monthly credit</strong> ($100 by default) and the <strong>day of the month it resets</strong> (the 17th by default, UTC).</li>
+  </ul>
+
+  <h2 id="hooks">What's waiting</h2>
+  <ul>
+    <li>
+      <strong>Claude Code hooks</strong>. <em>Add hooks</em> (in Settings, or <em>Add the hooks</em> on the Waiting tab) adds <code>Notification</code>, <code>Stop</code> and
+      <code>SessionEnd</code> hooks to <code>~/.claude/settings.json</code> (or <code>$CLAUDE_CONFIG_DIR/settings.json</code>),
+      each running <code>claude-overview --hook</code>. A copy of the file is kept beside it as
+      <code>settings.json.claude-overview.bak</code>, and your other settings and hooks are left alone.
+      <em>Remove the Claude Code hooks</em> takes only these entries out again. If the app moves, add the hooks again so they point at
+      the new path.
+    </li>
+    <li>
+      <strong>API key, for batches</strong> (<code>sk-ant-api…</code>), an ordinary key from
+      <a href="https://platform.claude.com/settings/keys">Console settings, API keys</a>. It lists the Message Batches in
+      that key's workspace.
+    </li>
+    <li>
+      <strong>GitHub token, for pull requests</strong>: a
+      <a href="https://github.com/settings/personal-access-tokens/new">fine-grained token</a> with read-only
+      <em>Pull requests</em> access to the repositories you want watched.
+    </li>
+  </ul>
+  <p class="co-note">
+    Keys and the token go into the OS keychain: Keychain on macOS, Credential Manager on Windows, and the Secret Service
+    on Linux. They are never written to the app's database or shown again; Settings shows the last four characters.
+    <a href={path('privacy/')}>Privacy</a> says where each one is sent.
+  </p>
+
+  <h2>Alerts</h2>
+  <p>
+    A switch for each kind of alert, and the <strong>threshold</strong> for the allowance and credit alerts (80% by
+    default). <em>Send a test notification</em> checks your system lets them through.
+  </p>
+  <Shot dark={alerts} light={alertsLight} alt="The Alerts settings: a switch for each alert, the threshold and a test button." />
+
+  <h2>Keyboard shortcut</h2>
+  <p>
+    <strong>Open the pop-over</strong>: <kbd>Ctrl+Alt+O</kbd> by default (<kbd>⌘⌥O</kbd> on a Mac). Change it or turn it
+    off. On Linux it needs X11.
+  </p>
+
+  <h2>Updates</h2>
+  <p>The version you have, the latest one, and <em>Install and restart</em> when there is a newer one. See <a href={path('updates/')}>Updates and releases</a>.</p>
+</Doc>

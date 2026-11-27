@@ -1,0 +1,80 @@
+/* The Claude Overview site, in the markpitt.dev brand. Tokens only, from the chrome kit's
+ * tokens.css. Measurements follow the main site: a 1024px frame with a 24px gutter, 96px section
+ * rhythm, mono eyebrows in the accent. */
+
+html { scroll-padding-top: 80px; }
+.co-site { margin: 0; background: var(--surface-body); color: var(--ink); font: 400 16px/1.5 var(--font-sans); -webkit-font-smoothing: antialiased; }
+/* Resets and defaults at zero specificity (:where), so every component rule below, and the
+ * chrome kit's own rules, win over them. */
+:where(.co-site) *, :where(.co-site) *::before, :where(.co-site) *::after { box-sizing: border-box; }
+:where(.co-site) :where(h1, h2, h3, p, ul, ol, figure, pre) { margin: 0; }
+:where(.co-site main) a { color: var(--accent-text); text-underline-offset: 3px; }
+:where(.co-site main) a:hover { text-decoration-thickness: 2px; }
+.co-site main :focus-visible { outline: 2px solid var(--accent-mark); outline-offset: 2px; border-radius: var(--radius-sm); }
+:where(.co-site) code { font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-pill); padding: 1px 6px; border-radius: var(--radius-sm); }
+:where(.co-site) kbd { font-family: var(--font-mono); font-size: 0.88em; padding: 1px 6px; border: 1px solid var(--border-control); border-radius: var(--radius-sm); }
+
+.co-wrap { max-width: calc(1024px + 2 * var(--space-6)); margin: 0 auto; padding: 0 var(--space-6); }
+.co-eyebrow { font: 400 12px/16px var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text); }
+.co-lede { font: var(--type-body); max-width: 65ch; color: var(--muted); margin-top: var(--space-4); }
+
+/* Home */
+.co-hero { padding: var(--space-16) 0 var(--space-12); }
+.co-hero h1 { font: var(--type-h1); letter-spacing: var(--type-h1-tracking); margin-top: var(--space-3); }
+.co-hero .co-lede { color: var(--ink); }
+.co-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+.co-btn { display: inline-flex; align-items: center; padding: var(--space-2) var(--space-4); font: var(--type-ui-label); border-radius: var(--radius-sm); border: 1px solid var(--border-control); color: var(--ink); text-decoration: none; }
+.co-btn.primary { background: var(--accent-text); border-color: var(--accent-text); color: var(--on-accent-text); }
+.co-btn:hover { text-decoration: underline; }
+.co-facts { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-6); padding: 0; list-style: none; font: var(--type-small); color: var(--muted); }
+.co-section { padding: var(--space-16) 0; border-top: 1px solid color-mix(in oklab, var(--ink) 10%, transparent); }
+.co-section > .co-wrap > h2 { margin-bottom: var(--space-8); }
+.co-features { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); padding: 0; list-style: none; }
+.co-feature { padding: var(--space-6); background: var(--surface-card); border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent); border-radius: var(--radius-md); }
+.co-feature h3 { font: var(--type-h3); margin-bottom: var(--space-2); }
+.co-feature p { color: var(--muted); }
+
+/* Screenshots: the dark one in the dark theme, its light twin in the light theme. */
+.co-shot { margin: var(--space-8) 0; }
+.co-shot-img { display: block; width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent); }
+.co-shot figcaption { margin-top: var(--space-2); font: var(--type-small); color: var(--muted); }
+.co-shot-light { display: none; }
+[data-theme="light"] .co-shot-light { display: block; }
+[data-theme="light"] .co-shot-dark { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .co-shot-light { display: block; }
+  :root:not([data-theme]) .co-shot-dark { display: none; }
+}
+
+/* Docs pages */
+.co-doc-head { padding: var(--space-12) 0 var(--space-8); }
+.co-doc-head h1 { font: var(--type-h1); letter-spacing: var(--type-h1-tracking); }
+.co-doc-body { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: var(--space-12); padding-bottom: var(--space-16); }
+.co-docs-nav h2 { font: var(--type-ui-label); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: var(--space-3); }
+.co-docs-nav ul { padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-2); position: sticky; top: 140px; }
+.co-docs-nav a { color: var(--muted); text-decoration: none; }
+.co-docs-nav a:hover { color: var(--ink); text-decoration: underline; }
+.co-docs-nav a[aria-current] { color: var(--ink); font-weight: 600; }
+
+.co-prose { font: var(--type-body); max-width: 70ch; }
+.co-prose > * + * { margin-top: var(--space-4); }
+.co-prose h2 { font: var(--type-h2); margin-top: var(--space-12); }
+.co-prose h3 { font: var(--type-h3); margin-top: var(--space-8); }
+.co-prose > :first-child { margin-top: 0; }
+.co-prose ul, .co-prose ol { padding-left: var(--space-6); }
+.co-prose li + li { margin-top: var(--space-2); }
+.co-prose pre { font: var(--type-code); font-size: 14px; background: var(--surface-pill); padding: var(--space-4); border-radius: var(--radius-md); overflow-x: auto; }
+.co-prose pre code { background: none; padding: 0; }
+.co-prose table { border-collapse: collapse; width: 100%; font: var(--type-ui); }
+.co-prose th, .co-prose td { text-align: left; vertical-align: top; padding: var(--space-2) var(--space-3); border-bottom: 1px solid color-mix(in oklab, var(--ink) 10%, transparent); }
+.co-prose th { font: var(--type-ui-label); color: var(--muted); }
+.co-table { overflow-x: auto; }
+.co-note { padding: var(--space-4); background: var(--surface-card); border-left: 2px solid var(--accent-mark); border-radius: var(--radius-sm); }
+
+@media (max-width: 760px) {
+  .co-hero { padding: var(--space-12) 0 var(--space-8); }
+  .co-hero h1, .co-doc-head h1 { font-size: 32px; }
+  .co-doc-body { grid-template-columns: minmax(0, 1fr); gap: var(--space-8); }
+  .co-docs-nav { order: -1; }
+  .co-docs-nav ul { position: static; flex-direction: row; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
+}

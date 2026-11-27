@@ -1,0 +1,64 @@
+---
+import Doc from '../layouts/Doc.astro';
+import { path, LATEST_URL } from '../lib/site';
+---
+
+<Doc
+  title="Install"
+  page="install/"
+  description="Download Claude Overview for Windows, Linux or macOS, and what to expect the first time it runs."
+  lede="Every release has installers for Windows, Linux and macOS on GitHub. After the first install, the app keeps itself up to date."
+>
+  <h2>Download</h2>
+  <p>Open the <a href={LATEST_URL}>latest release</a> and pick the file for your system:</p>
+  <div class="co-table">
+    <table>
+      <thead><tr><th>System</th><th>File</th></tr></thead>
+      <tbody>
+        <tr><td>Windows</td><td>The NSIS installer, <code>.exe</code></td></tr>
+        <tr><td>Linux</td><td><code>.deb</code> for Debian and Ubuntu, or the <code>.AppImage</code></td></tr>
+        <tr><td>macOS</td><td>The universal <code>.dmg</code>, for Apple silicon and Intel</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>The first run</h2>
+  <p>
+    The installers are not signed at the operating system level, so Windows SmartScreen and macOS Gatekeeper warn
+    the first time you open the app. The update files are signed, and the app refuses an update whose signature
+    doesn't match the key built into it (see <a href={path('updates/')}>Updates and releases</a>).
+  </p>
+  <p>
+    On first launch the main window opens, and the tray icon appears: the markpitt.dev disc, with a dot in the corner
+    for the worst current state of Claude's services.
+  </p>
+
+  <h2>Linux</h2>
+  <ul>
+    <li>
+      On GNOME, install the <em>AppIndicator and KStatusNotifierItem Support</em> extension, or no tray icon shows. The
+      main window still opens on launch.
+    </li>
+    <li>Tray icons on Linux send no click events, so the pop-over opens from the tray menu or the shortcut.</li>
+    <li>
+      Global shortcuts need X11. Under Wayland, bind a desktop shortcut to <code>claude-overview --popover</code>
+      instead.
+    </li>
+    <li>
+      Keys are stored with the Secret Service, so GNOME Keyring or KWallet must be running before you add one in
+      Settings.
+    </li>
+  </ul>
+
+  <h2>Start at login</h2>
+  <p>
+    Turn on <em>Start at login, in the tray</em> in Settings. The login entry passes <code>--hidden</code>, so nothing
+    opens until you ask for it.
+  </p>
+
+  <h2>Next</h2>
+  <p>
+    <a href={path('using-it/')}>Using it</a> covers the tray, the pop-over and each tab. <a href={path('settings/')}>Settings</a>
+    covers the keys and estimates the panels need.
+  </p>
+</Doc>
