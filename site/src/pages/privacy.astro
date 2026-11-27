@@ -1,0 +1,90 @@
+---
+import Doc from '../layouts/Doc.astro';
+import { path, REPO_URL } from '../lib/site';
+---
+
+<Doc
+  title="Privacy"
+  page="privacy/"
+  description="What Claude Overview reads on your machine, what it stores, and the only places it sends anything."
+  lede="Claude Overview has no server and no analytics. It talks to four services, and only those you give it a key for beyond the first."
+>
+  <h2>Who handles the network</h2>
+  <p>
+    The app's Rust core makes every network call and holds every key. The windows you see only draw what the core
+    sends them; they never see a key and never call out themselves.
+  </p>
+
+  <h2>What leaves your machine, and where it goes</h2>
+  <div class="co-table">
+    <table>
+      <thead><tr><th>Service</th><th>When</th><th>What is sent</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>status.claude.com</td>
+          <td>Every 2 minutes</td>
+          <td>A plain request for the public status feed. No key, nothing about you.</td>
+        </tr>
+        <tr>
+          <td>api.anthropic.com</td>
+          <td>Every 30 minutes with an Admin key; every 5 minutes with an API key</td>
+          <td>Your Admin key, to read this credit period's spend from the Usage and Cost Analytics API. Your API key, to list Message Batches. Only if you add them.</td>
+        </tr>
+        <tr>
+          <td>api.github.com</td>
+          <td>Every 5 minutes with a token</td>
+          <td>Your GitHub token, to search for open pull requests waiting for your review or opened by Claude Code. Only if you add one.</td>
+        </tr>
+        <tr>
+          <td>github.com</td>
+          <td>Once a day</td>
+          <td>A request for the latest release's <code>latest.json</code>, and the package itself when you choose <em>Install and restart</em>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Each key goes only to the service it belongs to. Nothing is sent to me or to anyone else.
+  </p>
+
+  <h2>What it reads on your machine</h2>
+  <ul>
+    <li>
+      Claude Code's transcripts, under <code>~/.claude/projects</code> (or the folder you set). It reads the usage on each
+      line: model, tokens, time and project. The transcripts are read where they are and never sent anywhere.
+    </li>
+    <li>
+      Claude Code's <code>settings.json</code>, only when you add or remove the hooks, to
+      add or take out its own three entries. A backup is kept beside it.
+    </li>
+  </ul>
+
+  <h2>What it stores</h2>
+  <ul>
+    <li>
+      A small SQLite database in the app's data folder: the usage it has read (kept for 90 days), how far it has read each
+      transcript, your settings, the last good API credit figures, and which alerts it has already sent.
+    </li>
+    <li>
+      Marker files in the same folder, written by the Claude Code hooks when a session is waiting, and removed when the
+      session moves on or ends.
+    </li>
+    <li>
+      Keys and the GitHub token in the OS keychain (Keychain, Credential Manager or the Secret Service), never in the
+      database or a file. Settings shows only their last four characters, and removing one there deletes it from the keychain.
+    </li>
+  </ul>
+
+  <h2>Removing it</h2>
+  <p>
+    Remove the Claude Code hooks in Settings before you uninstall, and remove each key there too: that deletes it from
+    the keychain. Then uninstall the app and delete its data folder.
+  </p>
+
+  <h2>Checking this</h2>
+  <p>
+    The app is open source under the MIT licence. Every network call is in the Rust core, in
+    <a href={`${REPO_URL}/tree/main/src-tauri/src`}><code>src-tauri/src</code></a>, and <a href={path('settings/')}>Settings</a>
+    lists each key and what it is for.
+  </p>
+</Doc>

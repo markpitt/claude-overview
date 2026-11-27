@@ -1,0 +1,79 @@
+---
+import Page from '../layouts/Page.astro';
+import Shot from '../components/Shot.astro';
+import { path, LATEST_URL, REPO_URL } from '../lib/site';
+import overview from '../../../docs/screenshots/overview.png';
+import overviewLight from '../../../docs/screenshots/overview-light.png';
+
+const features = [
+  ['Service status', "Claude's status from status.claude.com, with the worst current state as a dot on the tray icon."],
+  ['Max plan usage', 'Read from your local Claude Code logs: the current 5-hour block and when it resets, the last 7 and 30 days at API prices, by model and by project.'],
+  ['API credit', 'Spend against your monthly credit, the burn per day and a forecast to the reset date, from the Usage and Cost Analytics API.'],
+  ["What's waiting", 'Claude Code sessions that need you, Message Batches in progress, and pull requests waiting for your review.'],
+  ['Alerts', 'Desktop notifications for incidents, 80% of an allowance or the credit, and new pull requests. Each one can be turned off.'],
+  ['Pop-over and updates', 'A summary on a global shortcut, start at login, dark, light or system theme, and signed updates from GitHub releases.'],
+];
+---
+
+<Page
+  title="Claude Overview"
+  description="A tray app for Windows, Linux and macOS that puts Claude's service status, Max plan usage, API credit and the work waiting for you in one place."
+  page=""
+>
+  <div class="co-wrap">
+    <section class="co-hero" aria-labelledby="hero-title">
+      <p class="co-eyebrow">Tray app · Windows, Linux and macOS · MIT</p>
+      <h1 id="hero-title">Claude Overview</h1>
+      <p class="co-lede">
+        Claude Overview is a tray app for Windows, Linux and macOS that puts Claude's service status, Max plan
+        usage, API credit and the work waiting for you in one place.
+      </p>
+      <p class="co-lede">
+        I built it because I use Claude Code and the Claude API every day, and checking all of this meant three
+        websites and a terminal.
+      </p>
+      <div class="co-actions">
+        <a class="co-btn primary" href={LATEST_URL}>Download the latest release</a>
+        <a class="co-btn" href={path('install/')}>Install</a>
+        <a class="co-btn" href={REPO_URL}>Source on GitHub</a>
+      </div>
+      <ul class="co-facts">
+        <li>0.1.1, early days</li>
+        <li>Tauri 2, React and TypeScript</li>
+        <li>Rust owns every network call and key</li>
+      </ul>
+    </section>
+    <Shot dark={overview} light={overviewLight} alt="The Overview tab: service status, the current 5-hour block, API credit and what's waiting, as cards." />
+  </div>
+
+  <section class="co-section" aria-labelledby="shows-title">
+    <div class="co-wrap">
+      <h2 id="shows-title" class="co-eyebrow">What it shows</h2>
+      <ul class="co-features">
+        {
+          features.map(([title, text]) => (
+            <li class="co-feature">
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="co-section" aria-labelledby="early-title">
+    <div class="co-wrap co-prose">
+      <h2 id="early-title" class="co-eyebrow">Early days</h2>
+      <p>
+        0.1.1 is the current release. The Max plan figures are estimates against limits you set yourself, because
+        Anthropic doesn't publish them. I use it daily on Windows and Linux; the macOS build comes from CI and hasn't
+        been tested on hardware yet.
+      </p>
+      <p>
+        Read <a href={path('using-it/')}>Using it</a> for what each part does, and <a href={path('privacy/')}>Privacy</a>
+        for what leaves your machine.
+      </p>
+    </div>
+  </section>
+</Page>

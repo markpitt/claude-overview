@@ -1,0 +1,29 @@
+---
+// A docs page: the page title and lede, the docs list beside it, and the page's prose.
+import Page from './Page.astro';
+import DocsNav from '../components/DocsNav.astro';
+import type { Page as PageId } from '../lib/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  page: PageId;
+  lede: string;
+}
+const { title, description, page, lede } = Astro.props;
+---
+
+<Page title={title} description={description} page={page}>
+  <div class="co-wrap co-doc">
+    <header class="co-doc-head">
+      <h1>{title}</h1>
+      <p class="co-lede">{lede}</p>
+    </header>
+    <div class="co-doc-body">
+      <article class="co-prose">
+        <slot />
+      </article>
+      <DocsNav page={page} />
+    </div>
+  </div>
+</Page>

@@ -4,7 +4,8 @@ import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist", "src-tauri"] },
+  // site/ is the project's web site, a separate Astro project with its own checks.
+  { ignores: ["dist", "src-tauri", "site"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],

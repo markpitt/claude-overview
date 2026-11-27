@@ -1,0 +1,24 @@
+---
+// The docs pages, listed beside each one so a reader can move between them.
+import { DOCS, path, type Page } from '../lib/site';
+
+export interface Props {
+  page: Page;
+}
+const { page } = Astro.props;
+---
+
+<nav class="co-docs-nav" aria-label="Docs">
+  <h2>Docs</h2>
+  <ul>
+    {
+      DOCS.map((d) => (
+        <li>
+          <a href={path(d.page)} aria-current={d.page === page ? 'page' : undefined}>
+            {d.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

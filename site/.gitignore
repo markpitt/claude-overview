@@ -1,0 +1,9 @@
+# build output
+dist/
+.astro/
+node_modules/
+# the chrome kit, copied in at release; the monorepo keeps the one shared copy
+src/chrome/
+# playwright
+test-results/
+playwright-report/
