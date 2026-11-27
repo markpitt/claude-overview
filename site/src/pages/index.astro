@@ -38,7 +38,7 @@ const features = [
         <a class="co-btn" href={REPO_URL}>Source on GitHub</a>
       </div>
       <ul class="co-facts">
-        <li>0.1.1, early days</li>
+        <li>0.1.2, early days</li>
         <li>Tauri 2, React and TypeScript</li>
         <li>Rust owns every network call and key</li>
       </ul>
@@ -63,17 +63,19 @@ const features = [
   </section>
 
   <section class="co-section" aria-labelledby="early-title">
-    <div class="co-wrap co-prose">
+    <div class="co-wrap">
       <h2 id="early-title" class="co-eyebrow">Early days</h2>
-      <p>
-        0.1.1 is the current release. The Max plan figures are estimates against limits you set yourself, because
-        Anthropic doesn't publish them. I use it daily on Windows and Linux; the macOS build comes from CI and hasn't
-        been tested on hardware yet.
-      </p>
-      <p>
-        Read <a href={path('using-it/')}>Using it</a> for what each part does, and <a href={path('privacy/')}>Privacy</a>
-        for what leaves your machine.
-      </p>
+      <div class="co-prose">
+        <p>
+          0.1.2 is the current release. The Max plan figures are estimates against limits you set yourself, because
+          Anthropic doesn't publish them. I use it daily on Windows and Linux; the macOS build comes from CI and
+          hasn't been tested on hardware yet.
+        </p>
+        <p>
+          Read <a href={path('using-it/')}>Using it</a> for what each part does, and
+          <a href={path('privacy/')}>Privacy</a> for what leaves your machine.
+        </p>
+      </div>
     </div>
   </section>
 </Page>

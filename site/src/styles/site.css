@@ -56,6 +56,8 @@ html { scroll-padding-top: 80px; }
 .co-docs-nav a:hover { color: var(--ink); text-decoration: underline; }
 .co-docs-nav a[aria-current] { color: var(--ink); font-weight: 600; }
 
+/* Prose sits inside a .co-wrap, never on it: its max-width would shrink the frame and centre it,
+ * and its h2 rule would override a .co-eyebrow section heading. */
 .co-prose { font: var(--type-body); max-width: 70ch; }
 .co-prose > * + * { margin-top: var(--space-4); }
 .co-prose h2 { font: var(--type-h2); margin-top: var(--space-12); }
