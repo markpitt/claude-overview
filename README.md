@@ -181,3 +181,5 @@ See [docs/plan.md](docs/plan.md) for the full plan and decisions.
 ## Licence
 
 MIT, see [LICENSE](LICENSE). The bundled Inter and JetBrains Mono fonts are under the SIL Open Font License.
+
+The licence covers the code and docs. It doesn't cover the markpitt name or brand: the MARKPITT wordmark, the logo and the banners are © 2026 Mark Pitt, all rights reserved.
