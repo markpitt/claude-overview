@@ -10,8 +10,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Site, docs and README changes don't touch the app, so the app jobs skip for them. The site has
+  # its own workflow (pages.yml). The jobs skip with `if:` rather than a workflow-level `paths:`
+  # filter: the main ruleset requires the Frontend and Rust checks, and a skipped job reports as
+  # passing, whereas a workflow that never runs leaves them pending forever.
+  changes:
+    name: Changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.diff.outputs.app }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # No usable base (a new branch, or a force push) means build everything.
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "app=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then range="$BASE...$HEAD"; else range="$BASE..$HEAD"; fi
+          files=$(git diff --name-only "$range")
+          printf '%s\n' "$files"
+          # Anything outside these paths is an app change. An empty diff counts as one too.
+          if printf '%s\n' "$files" | grep -qvE '^(site/|docs/|README\.md$|LICENSE$|NOTICE$|\.github/workflows/pages\.yml$)'; then
+            echo "app=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "app=false" >> "$GITHUB_OUTPUT"
+          fi
+
   frontend:
     name: Frontend (typecheck, lint, test)
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +61,8 @@ jobs:
 
   rust:
     name: Rust (clippy, test)
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -48,7 +85,8 @@ jobs:
 
   build:
     name: Build (${{ matrix.platform }})
-    needs: [frontend, rust]
+    needs: [changes, frontend, rust]
+    if: needs.changes.outputs.app == 'true'
     strategy:
       fail-fast: false
       matrix:
