@@ -1,0 +1,57 @@
+---
+// Claude Overview's "page not found" page: markpitt.dev's 404 page (markpitt.github.io
+// src/pages/404.astro) inside this site's chrome. GitHub Pages serves this project's 404.html,
+// with a 404 status, at every address under /claude-overview/ that has nothing behind it.
+//
+// styles/not-found.css and scripts/not-found.ts are verbatim copies of the main site's: change
+// them there and copy them here. The main site's tests/e2e/not-found.spec.ts refuses a copy that
+// differs. Every link here goes through path(), because the page is served at any depth.
+import Page from '../layouts/Page.astro';
+import '../styles/not-found.css';
+import { path, DOCS } from '../lib/site';
+
+// Every address the "closest match" may suggest. The site's own home is the root, so it is the
+// one route never suggested: the list below already leads there.
+const routes = [
+  { key: path(), href: path(), label: 'Claude Overview' },
+  ...DOCS.map((d) => ({ key: path(d.page), href: path(d.page), label: d.label })),
+];
+
+const ways = [
+  { href: path(), label: 'Claude Overview', desc: 'What it shows, and where to get it.' },
+  { href: path('install/'), label: 'Install', desc: 'Installers for Windows, Linux and macOS.' },
+  { href: path('using-it/'), label: 'Docs', desc: 'Using it, its settings, and how updates work.' },
+  { href: '/', label: 'markpitt.dev', desc: 'The rest of my site: background, projects and skills.' },
+];
+---
+
+<Page title="Page not found" description="There is nothing at this address on the Claude Overview site." page="" notFound>
+  <div class="nf" data-nf data-nf-root={path()} data-nf-routes={JSON.stringify(routes)}>
+    <div class="nf-inner">
+      <p class="nf-code" aria-hidden="true">4<span class="nf-zero"><svg viewBox="0 0 460 460" focusable="false"><clipPath id="nf-crop"><circle cx="230" cy="230" r="230"></circle></clipPath><g clip-path="url(#nf-crop)"><rect class="nf-disc" width="460" height="460"></rect><circle class="nf-pupil" cx="230" cy="230" r="145"></circle></g></svg></span>4</p>
+      <h1 class="nf-title">Page not found</h1>
+      <p class="nf-lede">There's nothing at <span data-nf-where>this address</span>. Either the link is out of date or the address has a typo in it, and from here I can't tell which.</p>
+      <div class="nf-term" data-nf-term hidden>
+        <p class="nf-cmd"><span class="nf-prompt" aria-hidden="true">$</span>curl -sI https://markpitt.dev<span data-nf-term-path></span></p>
+        <p><span class="nf-status">HTTP/2 404</span></p>
+      </div>
+      <p class="nf-suggest" data-nf-suggest hidden>Closest match I have: <a data-nf-suggest-link href={path()}>{path()}</a> (<span data-nf-suggest-label>Claude Overview</span>)</p>
+      <h2 class="nf-routes-title">Try one of these</h2>
+      <ul class="nf-routes">
+        {ways.map((w) => (
+          <li class="nf-route">
+            <a href={w.href}>{w.label}</a>
+            <span class="nf-route-path">{w.href}</span>
+            <span class="nf-route-desc">{w.desc}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="nf-report">If a link on this site sent you here, that's my bug, not yours. <a data-nf-report href="mailto:mark@markpitt.dev?subject=Broken%20link%20on%20markpitt.dev">Email me the address</a> and I'll fix it.</p>
+    </div>
+  </div>
+</Page>
+
+<script>
+  import { run } from '../scripts/not-found';
+  run(document, window.location);
+</script>

@@ -14,12 +14,14 @@ export interface Props {
   title: string;
   description: string;
   page: Page;
+  /** The 404 page: kept out of search, and with no canonical address of its own. */
+  notFound?: boolean;
 }
 
-const { title, description, page } = Astro.props;
-const fullTitle = page === '' ? 'Claude Overview' : `${title} · Claude Overview`;
+const { title, description, page, notFound = false } = Astro.props;
+const fullTitle = page === '' && !notFound ? 'Claude Overview' : `${title} · Claude Overview`;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const current = (p: Page) => p === page;
+const current = (p: Page) => p === page && !notFound;
 const docsPages: Page[] = ['using-it/', 'settings/', 'updates/'];
 ---
 
@@ -30,12 +32,12 @@ const docsPages: Page[] = ['using-it/', 'settings/', 'updates/'];
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {notFound ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" type="image/svg+xml" href={path('favicon.svg')} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
+    {!notFound && <meta property="og:url" content={canonical} />}
   </head>
   <body class="co-site">
     <a class="mpc-skip" href="#main">Skip to content</a>
